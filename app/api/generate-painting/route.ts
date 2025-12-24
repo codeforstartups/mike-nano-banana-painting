@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
       address = "",
       name = "",
       withFrame = false,
+      aspectRatio = "1:1",
     } = await request.json();
 
     if (!imageBase64) {
@@ -68,6 +69,20 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
 - The painting should clearly show watercolor paper texture and the fluid, organic nature of watercolor paint
 - Ensure the painting has a professional, gallery-quality watercolor appearance
 - The output MUST look like a hand-painted watercolor artwork, not a photograph or any other painting medium`;
+
+    // Add aspect ratio instruction
+    const aspectRatioInstruction = 
+      aspectRatio === "1:1" 
+        ? "ASPECT RATIO REQUIREMENT (1:1 SQUARE):\n- The output image must be square (1:1 aspect ratio). Fill the entire square canvas completely with the painting.\n- Ensure the composition works well in a square format. If the original image is not square, intelligently crop or extend the scene to fill the square space naturally.\n- Adjust the framing as needed - you may need to zoom in/out, extend backgrounds, or add elements to fill the square canvas without leaving empty spaces.\n- The painting must completely fill the square frame from edge to edge."
+        : aspectRatio === "16:9"
+        ? "ASPECT RATIO REQUIREMENT (16:9 LANDSCAPE):\n- The output image must be landscape/widescreen (16:9 aspect ratio). Fill the entire wide canvas completely with the painting.\n- Ensure the composition works well in a landscape format. If the original image is not landscape, intelligently extend the scene horizontally or adjust the framing to fill the wide space naturally.\n- You may need to extend backgrounds, add elements to the sides, or adjust the framing to fill the wide canvas without leaving empty spaces.\n- The painting must completely fill the landscape frame from edge to edge."
+        : aspectRatio === "9:16"
+        ? "ASPECT RATIO REQUIREMENT (9:16 PORTRAIT):\n- The output image must be portrait/vertical (9:16 aspect ratio). Fill the entire tall canvas completely with the painting.\n- Ensure the composition works well in a portrait format. If the original image is not portrait, intelligently extend the scene vertically or adjust the framing to fill the tall space naturally.\n- You may need to extend backgrounds, add elements above or below, or adjust the framing to fill the tall canvas without leaving empty spaces.\n- The painting must completely fill the portrait frame from edge to edge."
+        : "";
+
+    if (aspectRatioInstruction) {
+      systemPrompt += `\n\n${aspectRatioInstruction}`;
+    }
 
     // Add remove obstacles instruction
     if (removeObstacles) {
@@ -136,7 +151,7 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
         config: {
           responseModalities: ["TEXT", "IMAGE"],
           imageConfig: {
-            aspectRatio: "1:1", // Match original or adjust as needed
+            aspectRatio: aspectRatio as "1:1" | "16:9" | "9:16" | "2:3" | "3:2" | "3:4" | "4:3" | "4:5" | "5:4" | "21:9",
             imageSize: "2K", // High quality
           },
         },
@@ -168,7 +183,7 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
           config: {
             responseModalities: ["TEXT", "IMAGE"],
             imageConfig: {
-              aspectRatio: "1:1",
+              aspectRatio: aspectRatio as "1:1" | "16:9" | "9:16" | "2:3" | "3:2" | "3:4" | "4:3" | "4:5" | "5:4" | "21:9",
             },
           },
         });
@@ -212,30 +227,53 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
         const storageDir = join(process.cwd(), "public", "generated-paintings");
         await mkdir(storageDir, { recursive: true });
 
-        // Generate unique filename with timestamp
+        // Generate unique folder name with timestamp
         const timestamp = Date.now();
         const randomSuffix = Math.random().toString(36).substring(2, 9);
-        const fileExtension = generatedImageMimeType.split("/")[1] || "png";
-        const filename = `painting-${timestamp}-${randomSuffix}.${fileExtension}`;
-        const filePath = join(storageDir, filename);
+        const folderName = `painting-${timestamp}-${randomSuffix}`;
+        const paintingFolder = join(storageDir, folderName);
+        
+        // Create folder for this painting
+        await mkdir(paintingFolder, { recursive: true });
 
-        // Convert base64 to buffer and save
-        const imageBuffer = Buffer.from(generatedImageData, "base64");
-        await writeFile(filePath, imageBuffer);
+        // Determine file extensions and normalize them
+        const getNormalizedExt = (mime: string): string => {
+          const ext = mime.split("/")[1] || "jpg";
+          // Normalize jpeg to jpg for better compatibility
+          if (ext === "jpeg") return "jpg";
+          return ext;
+        };
+        
+        const originalExt = getNormalizedExt(mimeType);
+        const generatedExt = getNormalizedExt(generatedImageMimeType);
 
-        // Create URL path for the saved image
-        const imageUrl = `/generated-paintings/${filename}`;
+        // Save original uploaded image
+        const originalImageBuffer = Buffer.from(base64Image, "base64");
+        const originalFilePath = join(paintingFolder, `original.${originalExt}`);
+        await writeFile(originalFilePath, originalImageBuffer);
 
-        console.log(`✅ Image saved to: ${filePath}`);
-        console.log(`📁 Accessible at: ${imageUrl}`);
+        // Save generated painting image
+        const generatedImageBuffer = Buffer.from(generatedImageData, "base64");
+        const generatedFilePath = join(paintingFolder, `generated.${generatedExt}`);
+        await writeFile(generatedFilePath, generatedImageBuffer);
+
+        // Create URL paths for the saved images
+        const originalImageUrl = `/generated-paintings/${folderName}/original.${originalExt}`;
+        const generatedImageUrl = `/generated-paintings/${folderName}/generated.${generatedExt}`;
+
+        console.log(`✅ Original image saved to: ${originalFilePath}`);
+        console.log(`✅ Generated image saved to: ${generatedFilePath}`);
+        console.log(`📁 Folder: ${paintingFolder}`);
 
         return NextResponse.json({
           success: true,
           description:
             description ||
             "Painting generated successfully with artistic transformation!",
-          imageUrl: imageUrl,
-          localPath: filePath,
+          imageUrl: generatedImageUrl,
+          originalImageUrl: originalImageUrl,
+          folderName: folderName,
+          localPath: paintingFolder,
           message: `Painting generated successfully using ${modelUsed}!`,
           model: modelUsed,
         });

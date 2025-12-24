@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+// Using regular img tag for local images to avoid Next.js Image optimization issues
 
 interface PaintingDisplayProps {
   paintingUrl: string | null;
@@ -14,14 +14,14 @@ export default function PaintingDisplay({
   isGenerating,
 }: PaintingDisplayProps) {
   return (
-    <div className="h-full flex flex-col">
-      <h2 className="text-3xl font-bold text-gray-900 mb-8">
+    <div className="h-full flex flex-col overflow-hidden">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6 flex-shrink-0">
         Your Generated Painting
       </h2>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col">
         {/* Painting Display Area */}
-        <div className="flex-1 mb-6 border-2 border-gray-200 rounded-lg bg-gray-50 flex items-center justify-center min-h-[400px]">
+        <div className="flex-1 min-h-0 border-2 border-gray-200 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
           {isGenerating ? (
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
@@ -36,11 +36,14 @@ export default function PaintingDisplay({
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <Image
+                <img
                   src={paintingUrl}
                   alt="Generated painting"
-                  fill
-                  className="object-contain"
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    console.error("Image load error:", paintingUrl);
+                    // Fallback to a placeholder or retry
+                  }}
                 />
               )}
             </div>

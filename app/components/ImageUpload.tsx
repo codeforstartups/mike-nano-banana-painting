@@ -7,6 +7,7 @@ interface PaintingOptions {
   address: string;
   name: string;
   withFrame: boolean;
+  aspectRatio: "1:1" | "16:9" | "9:16";
 }
 
 interface ImageUploadProps {
@@ -65,15 +66,15 @@ export default function ImageUpload({
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
+    <div className="h-full flex flex-col overflow-hidden">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6 flex-shrink-0">
         Create Your Painting
       </h1>
 
       {/* Image Upload Area */}
-      <div className="flex-1 mb-6">
+      <div className="flex-1 min-h-0 mb-6">
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors bg-gray-50"
+          className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors bg-gray-50 h-full flex items-center justify-center"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => fileInputRef.current?.click()}
@@ -85,9 +86,9 @@ export default function ImageUpload({
             onChange={handleFileChange}
             className="hidden"
           />
-          
+
           {preview ? (
-            <div className="relative w-full h-96 rounded-lg overflow-hidden">
+            <div className="relative w-full h-full max-h-full rounded-lg overflow-hidden">
               <img
                 src={preview}
                 alt="Uploaded image"
@@ -95,7 +96,7 @@ export default function ImageUpload({
               />
             </div>
           ) : (
-            <div className="py-16">
+            <div className="py-8">
               <svg
                 className="mx-auto h-16 w-16 text-gray-400"
                 stroke="currentColor"
@@ -124,8 +125,7 @@ export default function ImageUpload({
       </div>
 
       {/* Painting Options */}
-      <div className="mb-6 space-y-4">
-
+      <div className="mb-4 space-y-3 flex-shrink-0 overflow-y-auto">
         {/* Remove Obstacles */}
         <div className="flex items-center">
           <input
@@ -154,7 +154,7 @@ export default function ImageUpload({
             htmlFor="address"
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Address (Optional)
+            Address
           </label>
           <input
             type="text"
@@ -168,24 +168,53 @@ export default function ImageUpload({
           />
         </div>
 
-        {/* Name */}
+        {/* Aspect Ratio Option */}
         <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Painting Name (Optional)
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Aspect Ratio
           </label>
-          <input
-            type="text"
-            id="name"
-            value={paintingOptions.name}
-            onChange={(e) =>
-              onOptionsChange({ ...paintingOptions, name: e.target.value })
-            }
-            placeholder="Enter a name for your painting"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="aspectRatio"
+                checked={paintingOptions.aspectRatio === "1:1"}
+                onChange={() =>
+                  onOptionsChange({ ...paintingOptions, aspectRatio: "1:1" })
+                }
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+              />
+              <span className="ml-2 text-sm text-gray-700">Square (1:1)</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="aspectRatio"
+                checked={paintingOptions.aspectRatio === "16:9"}
+                onChange={() =>
+                  onOptionsChange({ ...paintingOptions, aspectRatio: "16:9" })
+                }
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+              />
+              <span className="ml-2 text-sm text-gray-700">
+                Landscape (16:9)
+              </span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="aspectRatio"
+                checked={paintingOptions.aspectRatio === "9:16"}
+                onChange={() =>
+                  onOptionsChange({ ...paintingOptions, aspectRatio: "9:16" })
+                }
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+              />
+              <span className="ml-2 text-sm text-gray-700">
+                Portrait (9:16)
+              </span>
+            </label>
+          </div>
         </div>
 
         {/* Frame Option */}
@@ -222,7 +251,7 @@ export default function ImageUpload({
         </div>
 
         {/* User Prompt Input */}
-        <div>
+        {/* <div>
           <label
             htmlFor="prompt"
             className="block text-sm font-medium text-gray-700 mb-2"
@@ -237,18 +266,17 @@ export default function ImageUpload({
             placeholder="Additional style preferences (e.g., 'vibrant colors, warm tones')"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Generate Button */}
       <button
         onClick={onGenerate}
         disabled={!hasImage || isGenerating}
-        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex-shrink-0"
       >
         {isGenerating ? "Generating..." : "Generate Painting"}
       </button>
     </div>
   );
 }
-

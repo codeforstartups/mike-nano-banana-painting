@@ -8,20 +8,32 @@ export const dynamic = "force-dynamic";
 async function getPaintings() {
   try {
     const paintingsDir = join(process.cwd(), "public", "generated-paintings");
-    const files = await readdir(paintingsDir);
+    const items = await readdir(paintingsDir, { withFileTypes: true });
     
-    // Filter for image files
-    const imageFiles = files.filter(
-      (file) =>
-        file.endsWith(".jpg") ||
-        file.endsWith(".jpeg") ||
-        file.endsWith(".png") ||
-        file.endsWith(".webp") ||
-        file.endsWith(".gif")
+    // Filter for directories only (each painting has its own folder)
+    const paintingFolders = items.filter((item) => item.isDirectory());
+
+    // Get painting data with generated image URLs
+    const paintingsWithImages = await Promise.all(
+      paintingFolders.map(async (folder) => {
+        const folderPath = join(paintingsDir, folder.name);
+        const files = await readdir(folderPath);
+        
+        // Find generated image file
+        const generatedFile = files.find((file) => file.startsWith("generated."));
+        
+        return {
+          folderName: folder.name,
+          generatedImageUrl: generatedFile
+            ? `/generated-paintings/${folder.name}/${generatedFile}`
+            : null,
+        };
+      })
     );
 
-    // Sort by filename (which includes timestamp, so newest first)
-    return imageFiles.sort().reverse();
+    return paintingsWithImages.sort((a, b) => 
+      b.folderName.localeCompare(a.folderName)
+    );
   } catch (error) {
     console.error("Error reading paintings directory:", error);
     return [];
@@ -63,31 +75,36 @@ export default async function GeneratedPaintingsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {paintings.map((filename) => {
-              const imageUrl = `/generated-paintings/${filename}`;
-              const timestamp = filename.match(/painting-(\d+)-/)?.[1];
+            {paintings.map((painting) => {
+              const timestamp = painting.folderName.match(/painting-(\d+)-/)?.[1];
               const date = timestamp
                 ? new Date(parseInt(timestamp)).toLocaleString()
                 : "Unknown date";
 
               return (
                 <Link
-                  key={filename}
-                  href={`/generated-paintings/${encodeURIComponent(filename)}`}
+                  key={painting.folderName}
+                  href={`/generated-paintings/${encodeURIComponent(painting.folderName)}`}
                   className="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow block"
                 >
                   <div className="aspect-square relative bg-gray-100">
-                    <Image
-                      src={imageUrl}
-                      alt={`Generated painting ${filename}`}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
+                    {painting.generatedImageUrl ? (
+                      <Image
+                        src={painting.generatedImageUrl}
+                        alt={`Generated painting ${painting.folderName}`}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                        No image
+                      </div>
+                    )}
                   </div>
                   <div className="p-4">
-                    <p className="text-sm text-gray-600 truncate" title={filename}>
-                      {filename}
+                    <p className="text-sm text-gray-600 truncate" title={painting.folderName}>
+                      {painting.folderName}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">{date}</p>
                   </div>

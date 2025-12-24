@@ -1,104 +1,94 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import ImageUpload from "./components/ImageUpload";
-import PaintingDisplay from "./components/PaintingDisplay";
+import Link from "next/link";
 
 export default function Home() {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [userPrompt, setUserPrompt] = useState<string>("");
-  const [paintingOptions, setPaintingOptions] = useState({
-    removeObstacles: false,
-    address: "",
-    name: "",
-    withFrame: false,
-  });
-  const [generatedPainting, setGeneratedPainting] = useState<string | null>(null);
-  const [paintingDescription, setPaintingDescription] = useState<string>("");
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  // Check if API key is configured on mount
-  useEffect(() => {
-    const checkApiKey = async () => {
-      try {
-        const response = await fetch("/api/test-api-key");
-        const data = await response.json();
-        console.log("API Key Status:", data);
-      } catch (error) {
-        console.error("Error checking API key:", error);
-      }
-    };
-
-    checkApiKey();
-  }, []);
-
-  const handleImageUpload = (imageUrl: string) => {
-    setUploadedImage(imageUrl);
-  };
-
-  const handleGenerate = async () => {
-    if (!uploadedImage) return;
-    
-    setIsGenerating(true);
-    setGeneratedPainting(null);
-    setPaintingDescription("");
-    
-    try {
-      const response = await fetch("/api/generate-painting", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imageBase64: uploadedImage,
-          userPrompt: userPrompt,
-          removeObstacles: paintingOptions.removeObstacles,
-          address: paintingOptions.address,
-          name: paintingOptions.name,
-          withFrame: paintingOptions.withFrame,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to generate painting");
-      }
-
-      setGeneratedPainting(data.imageUrl || uploadedImage);
-      setPaintingDescription(data.description || "Painting generated successfully.");
-    } catch (error: any) {
-      console.error("Error generating painting:", error);
-      setPaintingDescription(`Error: ${error.message}. Please try again.`);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-white">
-      <div className="flex h-screen">
-        {/* Left Side - Image Upload and Prompt */}
-        <div className="w-1/2 border-r border-gray-200 p-8 overflow-y-auto">
-          <ImageUpload
-            onImageUpload={handleImageUpload}
-            userPrompt={userPrompt}
-            onPromptChange={setUserPrompt}
-            paintingOptions={paintingOptions}
-            onOptionsChange={setPaintingOptions}
-            onGenerate={handleGenerate}
-            isGenerating={isGenerating}
-            hasImage={!!uploadedImage}
-          />
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+            Dashboard
+          </h1>
+          <p className="text-gray-600">Welcome to your painting workspace</p>
         </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link
+            href="/paintings/generate"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 group"
+          >
+            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🎨</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Generate Painting
+            </h2>
+            <p className="text-gray-600">
+              Create beautiful watercolor paintings from your images
+            </p>
+          </Link>
 
-        {/* Right Side - Generated Painting Display */}
-        <div className="w-1/2 p-8 overflow-y-auto">
-          <PaintingDisplay
-            paintingUrl={generatedPainting}
-            description={paintingDescription}
-            isGenerating={isGenerating}
-          />
+          <Link
+            href="/paintings/table"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-200 group"
+          >
+            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Paintings Table
+            </h2>
+            <p className="text-gray-600">
+              View all generated paintings in a table format
+            </p>
+          </Link>
+
+          <Link
+            href="/call-logs"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200 group"
+          >
+            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">📞</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Call Logs
+            </h2>
+            <p className="text-gray-600">
+              View and manage call logs from agents
+            </p>
+          </Link>
+
+          <Link
+            href="/state-data"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:border-yellow-300 hover:shadow-lg transition-all duration-200 group"
+          >
+            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🗺️</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              State Data
+            </h2>
+            <p className="text-gray-600">
+              Browse property data by state
+            </p>
+          </Link>
+
+          <Link
+            href="/settings"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-400 hover:shadow-lg transition-all duration-200 group"
+          >
+            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">⚙️</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Settings
+            </h2>
+            <p className="text-gray-600">
+              Configure prompts and user profile
+            </p>
+          </Link>
+
+          <Link
+            href="/generated-paintings"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:border-pink-300 hover:shadow-lg transition-all duration-200 group"
+          >
+            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🖼️</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Gallery
+            </h2>
+            <p className="text-gray-600">
+              Browse all generated paintings
+            </p>
+          </Link>
         </div>
       </div>
     </div>
