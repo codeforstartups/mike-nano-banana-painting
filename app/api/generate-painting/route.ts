@@ -137,36 +137,77 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
     // Add frame instruction based on frame type
     // All frames should include white matting with beveled edges (like a picture frame mat board)
     // CRITICAL: Only ONE outer frame should be generated. Do not add multiple frames or borders.
+    // CRITICAL: The frame must fill the ENTIRE image canvas - no extra space, padding, or background outside the frame.
     const frameInstructions: Record<string, string> = {
       none: "NO FRAME: Do not include any frame around the painting. The image should be the painting itself without any border or frame. Do not add any frames, borders, or decorative edges.",
-      "natural-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+      "natural-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS FOR CONSISTENCY:
+- FRAME FILLS ENTIRE CANVAS: The frame MUST extend to the very edges of the image. There should be NO extra space, padding, background, or margins outside the frame. The frame should touch all four edges of the image (top, bottom, left, right). The entire generated image should be the framed painting with zero space outside the frame.
 - ONLY ONE OUTER FRAME: Create exactly ONE thin Natural Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
-- OUTER FRAME SPECIFICATIONS: A Natural Oak wood frame with light, natural wood grain. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have warm, honey-toned oak wood appearance with visible wood grain texture and a natural, light brown color typical of natural oak wood. The frame should be elegant and complement the watercolor painting without being too prominent or thick.
+
+- NATURAL OAK FRAME - DETAILED SPECIFICATIONS FOR CONSISTENCY:
+  * COLOR: Warm, honey-toned natural oak color. The base color should be a light to medium golden-brown (similar to #D4A574 or #C9A961). It should NOT be dark brown, black, or gray. The color should be warm and inviting, like natural oak wood that has been lightly finished.
+  * WOOD GRAIN: Visible, prominent oak wood grain patterns. The grain should show characteristic oak features: long, flowing lines with occasional medullary rays (small perpendicular lines that create a distinctive oak pattern). The grain should be clearly visible but not overly dramatic.
+  * TEXTURE: Natural wood texture with subtle variations. The surface should show the organic nature of real oak wood with slight color variations, natural knots or grain patterns, and a matte to semi-gloss finish typical of natural oak.
+  * THICKNESS: THIN and NARROW frame width (approximately 0.2 inches). The frame should be elegant and refined, not chunky or heavy.
+  * APPEARANCE: Classic, traditional look with warm, natural tones. The frame should complement watercolor paintings with its warm, organic appearance.
+  * MITERED CORNERS: The frame should have clean, precise mitered corners (45-degree angle joints) where the frame pieces meet, creating a professional, finished appearance.
+  * CONSISTENCY: Every time "Natural Oak" is selected, the frame must have these exact characteristics: warm golden-brown color, visible oak grain patterns, thin profile, mitered corners, and natural wood texture.
+
 - ${frameDimensions}
-- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
-- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (Natural Oak) → White matting with beveled edges → Watercolor painting in the center.
-- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
-      "black-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white (#FFFFFF or very close), approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The beveled edge should create a subtle shadow effect. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin Natural Oak wood frame (with exact specifications above) that fills the entire canvas edge-to-edge → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, decorative elements, or empty space outside the frame. The frame is the complete image boundary.`,
+      "black-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS FOR CONSISTENCY:
+- FRAME FILLS ENTIRE CANVAS: The frame MUST extend to the very edges of the image. There should be NO extra space, padding, background, or margins outside the frame. The frame should touch all four edges of the image (top, bottom, left, right). The entire generated image should be the framed painting with zero space outside the frame.
 - ONLY ONE OUTER FRAME: Create exactly ONE thin Black Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
-- OUTER FRAME SPECIFICATIONS: A Black Oak wood frame with a solid black appearance and subtle wood texture. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have a sleek, modern look with a deep black color and slight wood grain texture visible. The frame should be elegant and provide strong contrast without being too thick or substantial.
+
+- BLACK OAK FRAME - DETAILED SPECIFICATIONS FOR CONSISTENCY:
+  * COLOR: Deep, rich black color (similar to #1A1A1A or #2C2C2C). The frame should be predominantly black, but NOT pure black (#000000). It should have a very dark charcoal or ebony appearance with subtle brown undertones that hint at its oak wood origin. The color should be dark enough to provide strong contrast but still show that it's wood, not painted metal.
+  * WOOD GRAIN: Subtle but visible wood grain texture. Even though the frame is black, the oak wood grain should still be faintly visible through the dark finish. The grain should appear as slightly lighter or darker variations within the black, creating texture and depth. The grain pattern should be subtle - visible upon close inspection but not overpowering.
+  * TEXTURE: Smooth wood texture with a matte or satin finish. The surface should feel like stained oak wood, not painted or lacquered. There should be a slight sheen but not glossy. The texture should show the wood's natural character even through the dark stain.
+  * THICKNESS: THIN and NARROW frame width (approximately 0.3-0.5 inches or 8-12mm visible width). The frame should be sleek and modern, not bulky or heavy.
+  * APPEARANCE: Modern, sophisticated look with strong contrast. The black frame should provide elegant contrast against the white matting and complement the watercolor painting with its bold, contemporary aesthetic.
+  * MITERED CORNERS: The frame should have clean, precise mitered corners (45-degree angle joints) where the frame pieces meet, creating a professional, finished appearance.
+  * CONSISTENCY: Every time "Black Oak" is selected, the frame must have these exact characteristics: deep black color with subtle brown undertones, faintly visible oak grain, thin profile, mitered corners, and matte/satin wood texture.
+
 - ${frameDimensions}
-- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
-- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (Black Oak) → White matting with beveled edges → Watercolor painting in the center.
-- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
-      "dark-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white (#FFFFFF or very close), approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The beveled edge should create a subtle shadow effect. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin Black Oak wood frame (with exact specifications above) that fills the entire canvas edge-to-edge → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, decorative elements, or empty space outside the frame. The frame is the complete image boundary.`,
+      "dark-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS FOR CONSISTENCY:
+- FRAME FILLS ENTIRE CANVAS: The frame MUST extend to the very edges of the image. There should be NO extra space, padding, background, or margins outside the frame. The frame should touch all four edges of the image (top, bottom, left, right). The entire generated image should be the framed painting with zero space outside the frame.
 - ONLY ONE OUTER FRAME: Create exactly ONE thin Dark Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
-- OUTER FRAME SPECIFICATIONS: A Dark Oak wood frame with a dark brown appearance and visible wood grain texture. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have a rich, dark brown color typical of dark oak wood with prominent grain patterns. The frame should be classic and elegant without being too thick or wide.
+
+- DARK OAK FRAME - DETAILED SPECIFICATIONS FOR CONSISTENCY:
+  * COLOR: Rich, dark brown color (similar to #5C4033 or #6B4423). The frame should be a deep, warm brown - darker than natural oak but lighter than black oak. It should have a classic, traditional dark wood appearance, like dark oak or walnut. The color should be distinctly brown, not black or gray.
+  * WOOD GRAIN: Prominent, clearly visible oak wood grain patterns. The grain should be more visible than in Black Oak but similar to Natural Oak. The grain should show characteristic oak features: long, flowing lines with medullary rays. The grain should be dark brown to almost black lines against the dark brown base, creating clear contrast and texture.
+  * TEXTURE: Rich wood texture with natural variations. The surface should show the organic nature of dark oak wood with visible grain patterns, natural color variations, and a matte to semi-gloss finish. The texture should be more pronounced than Black Oak but similar in character to Natural Oak.
+  * THICKNESS: THIN and NARROW frame width (approximately 0.3-0.5 inches or 8-12mm visible width). The frame should be elegant and refined, not chunky or heavy.
+  * APPEARANCE: Classic, traditional look with rich, dark brown tones. The frame should have a timeless, elegant appearance that complements watercolor paintings with its sophisticated dark wood aesthetic.
+  * MITERED CORNERS: The frame should have clean, precise mitered corners (45-degree angle joints) where the frame pieces meet, creating a professional, finished appearance.
+  * CONSISTENCY: Every time "Dark Oak" is selected, the frame must have these exact characteristics: rich dark brown color (not black), prominent oak grain patterns, thin profile, mitered corners, and natural wood texture with visible grain.
+
 - ${frameDimensions}
-- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
-- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (Dark Oak) → White matting with beveled edges → Watercolor painting in the center.
-- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
-      "white-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white (#FFFFFF or very close), approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The beveled edge should create a subtle shadow effect. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin Dark Oak wood frame (with exact specifications above) that fills the entire canvas edge-to-edge → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, decorative elements, or empty space outside the frame. The frame is the complete image boundary.`,
+      "white-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS FOR CONSISTENCY:
+- FRAME FILLS ENTIRE CANVAS: The frame MUST extend to the very edges of the image. There should be NO extra space, padding, background, or margins outside the frame. The frame should touch all four edges of the image (top, bottom, left, right). The entire generated image should be the framed painting with zero space outside the frame.
 - ONLY ONE OUTER FRAME: Create exactly ONE thin White Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
-- OUTER FRAME SPECIFICATIONS: A White Oak wood frame with a white or very light-colored appearance and subtle wood texture. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have a clean, bright look with a white or off-white color and gentle wood grain texture. The frame should be light and airy without being too thick or substantial.
+
+- WHITE OAK FRAME - DETAILED SPECIFICATIONS FOR CONSISTENCY:
+  * COLOR: Light, pale color ranging from off-white to very light beige (similar to #F5F5DC or #FAF0E6). The frame should be white or cream-colored, but NOT pure white (#FFFFFF) - it should have a subtle warm tone that indicates it's natural wood, not painted white. The color should be lighter than Natural Oak but still show wood character.
+  * WOOD GRAIN: Subtle, gentle oak wood grain patterns. The grain should be visible but delicate - lighter in color than the base wood, creating a soft, refined texture. The grain should be less prominent than Natural Oak or Dark Oak, but still clearly identifiable as oak wood. The grain lines should be pale beige or light gray against the light background.
+  * TEXTURE: Smooth, refined wood texture with minimal variation. The surface should be clean and bright with a subtle matte to satin finish. The texture should be more uniform than darker oak varieties, but still show the natural character of white oak wood.
+  * THICKNESS: THIN and NARROW frame width (approximately 0.3-0.5 inches or 8-12mm visible width). The frame should be light and airy, not chunky or heavy.
+  * APPEARANCE: Clean, bright, modern look with light, airy tones. The frame should have a fresh, contemporary appearance that complements watercolor paintings with its light, elegant aesthetic. It should feel bright and open, not heavy or dark.
+  * MITERED CORNERS: The frame should have clean, precise mitered corners (45-degree angle joints) where the frame pieces meet, creating a professional, finished appearance.
+  * CONSISTENCY: Every time "White Oak" is selected, the frame must have these exact characteristics: light off-white/cream color (not pure white), subtle oak grain patterns, thin profile, mitered corners, and smooth, refined wood texture.
+
 - ${frameDimensions}
-- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
-- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (White Oak) → White matting with beveled edges → Watercolor painting in the center.
-- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white (#FFFFFF or very close), approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The beveled edge should create a subtle shadow effect. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin White Oak wood frame (with exact specifications above) that fills the entire canvas edge-to-edge → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, decorative elements, or empty space outside the frame. The frame is the complete image boundary.`,
     };
 
     if (frameInstructions[frameType]) {
