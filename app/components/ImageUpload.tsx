@@ -6,7 +6,7 @@ interface PaintingOptions {
   removeObstacles: boolean;
   address: string;
   name: string;
-  withFrame: boolean;
+  frameType: "none" | "natural-oak" | "black-oak" | "dark-oak" | "white-oak";
   aspectRatio: "1:1" | "16:9" | "9:16";
 }
 
@@ -197,7 +197,7 @@ export default function ImageUpload({
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
               />
               <span className="ml-2 text-sm text-gray-700">
-                Landscape (16:9)
+                Landscape (4:3)
               </span>
             </label>
             <label className="flex items-center">
@@ -211,7 +211,7 @@ export default function ImageUpload({
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
               />
               <span className="ml-2 text-sm text-gray-700">
-                Portrait (9:16)
+                Portrait (3:4)
               </span>
             </label>
           </div>
@@ -220,33 +220,161 @@ export default function ImageUpload({
         {/* Frame Option */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Frame
+            Pick Your Frame
           </label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="frame"
-                checked={paintingOptions.withFrame}
-                onChange={() =>
-                  onOptionsChange({ ...paintingOptions, withFrame: true })
-                }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-              />
-              <span className="ml-2 text-sm text-gray-700">With Frame</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="frame"
-                checked={!paintingOptions.withFrame}
-                onChange={() =>
-                  onOptionsChange({ ...paintingOptions, withFrame: false })
-                }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-              />
-              <span className="ml-2 text-sm text-gray-700">Without Frame</span>
-            </label>
+          <p className="text-xs text-gray-500 mb-3">12x16 in | 31x41 cm</p>
+          <div className="flex gap-3 flex-wrap">
+            {/* Natural Oak */}
+            <button
+              type="button"
+              onClick={() =>
+                onOptionsChange({ ...paintingOptions, frameType: "natural-oak" })
+              }
+              className={`flex flex-col items-center p-3 rounded-lg bg-white border transition-all ${
+                paintingOptions.frameType === "natural-oak"
+                  ? "border-blue-600 shadow-md"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <div className="w-20 h-20 rounded mb-2 relative overflow-hidden bg-white">
+                {/* Outer frame - Natural Oak (mitered corner in top-left) */}
+                <div 
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{
+                    background: `linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)`,
+                    clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                  }}
+                >
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(180, 83, 9, 0.15) 1px, rgba(180, 83, 9, 0.15) 2px)`,
+                      clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                      backgroundSize: '4px 4px'
+                    }}
+                  ></div>
+                </div>
+                {/* White matting with beveled edge (inner border) */}
+                <div className="absolute inset-2 bg-white rounded-sm"></div>
+                {/* Inner opening showing the painting area */}
+                <div className="absolute inset-5 bg-gray-50 rounded-sm"></div>
+              </div>
+              <span className="text-xs text-gray-700 font-medium">Natural Oak</span>
+            </button>
+
+            {/* Black Oak */}
+            <button
+              type="button"
+              onClick={() =>
+                onOptionsChange({ ...paintingOptions, frameType: "black-oak" })
+              }
+              className={`flex flex-col items-center p-3 rounded-lg bg-white border transition-all ${
+                paintingOptions.frameType === "black-oak"
+                  ? "border-blue-600 shadow-md"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <div className="w-20 h-20 rounded mb-2 relative overflow-hidden bg-white">
+                {/* Outer frame - Black Oak (mitered corner in top-left) */}
+                <div 
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{
+                    background: `linear-gradient(135deg, #1f2937 0%, #111827 50%, #000000 100%)`,
+                    clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                  }}
+                >
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(0, 0, 0, 0.3) 1px, rgba(0, 0, 0, 0.3) 2px)`,
+                      clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                      backgroundSize: '3px 3px'
+                    }}
+                  ></div>
+                </div>
+                {/* White matting with beveled edge (inner border) */}
+                <div className="absolute inset-2 bg-white rounded-sm"></div>
+                {/* Inner opening showing the painting area */}
+                <div className="absolute inset-5 bg-gray-50 rounded-sm"></div>
+              </div>
+              <span className="text-xs text-gray-700 font-medium">Black Oak</span>
+            </button>
+
+            {/* Dark Oak */}
+            <button
+              type="button"
+              onClick={() =>
+                onOptionsChange({ ...paintingOptions, frameType: "dark-oak" })
+              }
+              className={`flex flex-col items-center p-3 rounded-lg bg-white border transition-all ${
+                paintingOptions.frameType === "dark-oak"
+                  ? "border-blue-600 shadow-md"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <div className="w-20 h-20 rounded mb-2 relative overflow-hidden bg-white">
+                {/* Outer frame - Dark Oak (mitered corner in top-left) */}
+                <div 
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{
+                    background: `linear-gradient(135deg, #78350f 0%, #92400e 50%, #7c2d12 100%)`,
+                    clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                  }}
+                >
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(120, 53, 15, 0.25) 1px, rgba(120, 53, 15, 0.25) 2px)`,
+                      clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                      backgroundSize: '4px 4px'
+                    }}
+                  ></div>
+                </div>
+                {/* White matting with beveled edge (inner border) */}
+                <div className="absolute inset-2 bg-white rounded-sm"></div>
+                {/* Inner opening showing the painting area */}
+                <div className="absolute inset-5 bg-gray-50 rounded-sm"></div>
+              </div>
+              <span className="text-xs text-gray-700 font-medium">Dark Oak</span>
+            </button>
+
+            {/* White Oak */}
+            <button
+              type="button"
+              onClick={() =>
+                onOptionsChange({ ...paintingOptions, frameType: "white-oak" })
+              }
+              className={`flex flex-col items-center p-3 rounded-lg bg-white border transition-all ${
+                paintingOptions.frameType === "white-oak"
+                  ? "border-blue-600 shadow-md"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <div className="w-20 h-20 rounded mb-2 relative overflow-hidden bg-white">
+                {/* Outer frame - White Oak (mitered corner in top-left) */}
+                <div 
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{
+                    background: `linear-gradient(135deg, #f9fafb 0%, #f3f4f6 50%, #e5e7eb 100%)`,
+                    clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                  }}
+                >
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(156, 163, 175, 0.2) 1px, rgba(156, 163, 175, 0.2) 2px)`,
+                      clipPath: 'polygon(0 0, 0 35%, 35% 0)',
+                      backgroundSize: '4px 4px'
+                    }}
+                  ></div>
+                </div>
+                {/* White matting with beveled edge (inner border) */}
+                <div className="absolute inset-2 bg-white rounded-sm"></div>
+                {/* Inner opening showing the painting area */}
+                <div className="absolute inset-5 bg-gray-50 rounded-sm"></div>
+              </div>
+              <span className="text-xs text-gray-700 font-medium">White Oak</span>
+            </button>
           </div>
         </div>
 

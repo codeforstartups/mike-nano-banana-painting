@@ -31,7 +31,7 @@ export default function Home() {
           >
             <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              Paintings Table
+              Painting Comparison Dashboard
             </h2>
             <p className="text-gray-600">
               View all generated paintings in a table format

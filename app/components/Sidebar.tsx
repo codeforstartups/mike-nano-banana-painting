@@ -124,10 +124,10 @@ export default function Sidebar() {
                   ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50"
                   : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
               } ${isCollapsed ? "justify-center" : ""}`}
-              title={isCollapsed ? "Paintings Table" : ""}
+              title={isCollapsed ? "Painting Comparison Dashboard" : ""}
             >
               <span className={`text-lg ${isCollapsed ? "" : "mr-3"}`}>📊</span>
-              {!isCollapsed && <span className="font-medium">Paintings Table</span>}
+              {!isCollapsed && <span className="font-medium">Painting Comparison Dashboard</span>}
             </Link>
           </li>
 

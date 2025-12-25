@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       removeObstacles = false,
       address = "",
       name = "",
-      withFrame = false,
+      frameType = "none",
       aspectRatio = "1:1",
     } = await request.json();
 
@@ -71,13 +71,13 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
 - The output MUST look like a hand-painted watercolor artwork, not a photograph or any other painting medium`;
 
     // Add aspect ratio instruction
-    const aspectRatioInstruction = 
-      aspectRatio === "1:1" 
+    const aspectRatioInstruction =
+      aspectRatio === "1:1"
         ? "ASPECT RATIO REQUIREMENT (1:1 SQUARE):\n- The output image must be square (1:1 aspect ratio). Fill the entire square canvas completely with the painting.\n- Ensure the composition works well in a square format. If the original image is not square, intelligently crop or extend the scene to fill the square space naturally.\n- Adjust the framing as needed - you may need to zoom in/out, extend backgrounds, or add elements to fill the square canvas without leaving empty spaces.\n- The painting must completely fill the square frame from edge to edge."
         : aspectRatio === "16:9"
-        ? "ASPECT RATIO REQUIREMENT (16:9 LANDSCAPE):\n- The output image must be landscape/widescreen (16:9 aspect ratio). Fill the entire wide canvas completely with the painting.\n- Ensure the composition works well in a landscape format. If the original image is not landscape, intelligently extend the scene horizontally or adjust the framing to fill the wide space naturally.\n- You may need to extend backgrounds, add elements to the sides, or adjust the framing to fill the wide canvas without leaving empty spaces.\n- The painting must completely fill the landscape frame from edge to edge."
+        ? "ASPECT RATIO REQUIREMENT (4:3 LANDSCAPE):\n- The output image must be landscape with a 4:3 aspect ratio (equivalent to 12:9 inches frame dimensions). This is a traditional landscape frame ratio.\n- The image should have a classic landscape frame proportion (12 inches wide by 9 inches tall).\n- Fill the entire canvas completely with the painting. Ensure the composition works well in this landscape format.\n- If the original image is not in this ratio, intelligently extend the scene horizontally or adjust the framing to fill the space naturally.\n- You may need to extend backgrounds, add elements to the sides, or adjust the framing to fill the canvas without leaving empty spaces.\n- The painting must completely fill the landscape frame from edge to edge."
         : aspectRatio === "9:16"
-        ? "ASPECT RATIO REQUIREMENT (9:16 PORTRAIT):\n- The output image must be portrait/vertical (9:16 aspect ratio). Fill the entire tall canvas completely with the painting.\n- Ensure the composition works well in a portrait format. If the original image is not portrait, intelligently extend the scene vertically or adjust the framing to fill the tall space naturally.\n- You may need to extend backgrounds, add elements above or below, or adjust the framing to fill the tall canvas without leaving empty spaces.\n- The painting must completely fill the portrait frame from edge to edge."
+        ? "ASPECT RATIO REQUIREMENT (3:4 PORTRAIT):\n- The output image must be portrait/vertical with a 3:4 aspect ratio (equivalent to 9:12 inches frame dimensions). This is a traditional portrait frame ratio.\n- The image should have a classic portrait frame proportion (9 inches wide by 12 inches tall).\n- Fill the entire canvas completely with the painting. Ensure the composition works well in this portrait format.\n- If the original image is not in this ratio, intelligently extend the scene vertically or adjust the framing to fill the space naturally.\n- You may need to extend backgrounds, add elements above or below, or adjust the framing to fill the canvas without leaving empty spaces.\n- The painting must completely fill the portrait frame from edge to edge."
         : "";
 
     if (aspectRatioInstruction) {
@@ -100,13 +100,15 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
     }
 
     if (textToAdd) {
-      systemPrompt += `\n\nTEXT REQUIREMENT: Add the following text in the bottom right corner of the painting: "${textToAdd}". The text should be:
+      systemPrompt += `\n\nTEXT REQUIREMENT: Add the following text in the bottom right corner of the painting (on the white matting): "${textToAdd}". The text should be:
 - Clearly legible and readable
-- Positioned in the bottom right corner
-- Styled appropriately for a watercolor painting (can be handwritten style, elegant script, or clean sans-serif)
-- Subtle enough not to overpower the painting but visible enough to be read
-- Use a color that contrasts well with the background (dark text on light areas, light text on dark areas)
-- Size should be proportional to the painting (not too large, not too small)`;
+- Positioned in the bottom right corner of the white matting area
+- Styled in an elegant, flowing script font similar to "Ocean Trace" - a monoline script with fluid, cursive letterforms, delicate strokes, and graceful curves that mimic elegant handwriting
+- The font should have a sophisticated, refined appearance with smooth, flowing lines that complement the watercolor painting style
+- Subtle enough not to overpower the painting but visible enough to be read clearly
+- Use a color that contrasts well with the white matting (typically dark gray or black text for good readability on white)
+- Size should be proportional to the painting and matting (not too large, not too small - elegant and refined)
+- The text should appear as if it was elegantly handwritten or printed in a high-quality script font`;
     } else {
       // If address was provided but no name, still use it for context
       if (address.trim()) {
@@ -114,9 +116,61 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
       }
     }
 
-    // Add frame instruction
-    if (withFrame) {
-      systemPrompt += `\n\nFRAME: Include a minimal, simple frame around the painting. The frame should be clean and understated - a thin, subtle border that does not distract from the watercolor painting itself. Keep it minimal and elegant, not decorative or ornate.`;
+    // Calculate frame dimensions based on aspect ratio
+    // Reference: 12"x16" outer, 8"x10" inner, 56mm (2.2") left/right borders, 81mm (3.2") top/bottom borders
+    let frameDimensions = "";
+    if (aspectRatio === "9:16") {
+      // Portrait: 9"x12" outer frame
+      // Proportional calculation: borders ~18.4% of width, ~20% of height
+      // Inner: ~6"x7.5" (66.7% of width, 62.5% of height)
+      frameDimensions = `OUTER FRAME DIMENSIONS: 9" wide x 12" tall (portrait orientation). INNER MATTING OPENING: Approximately 6" wide x 7.5" tall. MATTING BORDERS: Left/right borders approximately 1.5" (38mm) each, top/bottom borders approximately 2.25" (57mm) each. The matting borders should be wider at the top and bottom than on the sides.`;
+    } else if (aspectRatio === "16:9") {
+      // Landscape: 12"x9" outer frame (4:3 ratio)
+      // Proportional calculation: borders similar to portrait but adjusted for landscape
+      // Inner: ~8"x6" (66.7% of width, 66.7% of height)
+      frameDimensions = `OUTER FRAME DIMENSIONS: 12" wide x 9" tall (landscape orientation, 4:3 ratio). INNER MATTING OPENING: Approximately 8" wide x 6" tall. MATTING BORDERS: Left/right borders approximately 2" (51mm) each, top/bottom borders approximately 1.5" (38mm) each. The matting borders should be wider on the left and right sides than at the top and bottom.`;
+    } else {
+      // Square: 12"x12" outer frame (proportional)
+      frameDimensions = `OUTER FRAME DIMENSIONS: 12" wide x 12" tall (square orientation). INNER MATTING OPENING: Approximately 8" wide x 8" tall. MATTING BORDERS: All borders approximately 2" (51mm) each, creating equal spacing around the painting.`;
+    }
+
+    // Add frame instruction based on frame type
+    // All frames should include white matting with beveled edges (like a picture frame mat board)
+    // CRITICAL: Only ONE outer frame should be generated. Do not add multiple frames or borders.
+    const frameInstructions: Record<string, string> = {
+      none: "NO FRAME: Do not include any frame around the painting. The image should be the painting itself without any border or frame. Do not add any frames, borders, or decorative edges.",
+      "natural-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+- ONLY ONE OUTER FRAME: Create exactly ONE thin Natural Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
+- OUTER FRAME SPECIFICATIONS: A Natural Oak wood frame with light, natural wood grain. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have warm, honey-toned oak wood appearance with visible wood grain texture and a natural, light brown color typical of natural oak wood. The frame should be elegant and complement the watercolor painting without being too prominent or thick.
+- ${frameDimensions}
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (Natural Oak) → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
+      "black-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+- ONLY ONE OUTER FRAME: Create exactly ONE thin Black Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
+- OUTER FRAME SPECIFICATIONS: A Black Oak wood frame with a solid black appearance and subtle wood texture. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have a sleek, modern look with a deep black color and slight wood grain texture visible. The frame should be elegant and provide strong contrast without being too thick or substantial.
+- ${frameDimensions}
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (Black Oak) → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
+      "dark-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+- ONLY ONE OUTER FRAME: Create exactly ONE thin Dark Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
+- OUTER FRAME SPECIFICATIONS: A Dark Oak wood frame with a dark brown appearance and visible wood grain texture. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have a rich, dark brown color typical of dark oak wood with prominent grain patterns. The frame should be classic and elegant without being too thick or wide.
+- ${frameDimensions}
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (Dark Oak) → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
+      "white-oak": `FRAME WITH MATTING - CRITICAL INSTRUCTIONS:
+- ONLY ONE OUTER FRAME: Create exactly ONE thin White Oak wood frame as the outermost border. Do NOT add multiple frames, double frames, or additional borders.
+- OUTER FRAME SPECIFICATIONS: A White Oak wood frame with a white or very light-colored appearance and subtle wood texture. The frame should be THIN and NARROW (approximately half the width of a typical frame). The frame should have a clean, bright look with a white or off-white color and gentle wood grain texture. The frame should be light and airy without being too thick or substantial.
+- ${frameDimensions}
+- WHITE MATTING: Inside the SINGLE outer frame, include a wide white mat board (matting) that surrounds the watercolor painting. The matting should be pure white, approximately 1.5mm thick, with beveled (slanted) edges on the inner opening. The matting borders must follow the exact dimensions specified above. The matting is NOT a frame - it is a mat board inside the frame.
+- FINAL STRUCTURE (from outside to inside): ONE thin wood frame (White Oak) → White matting with beveled edges → Watercolor painting in the center.
+- DO NOT add any additional frames, borders, or decorative elements beyond this single structure.`,
+    };
+
+    if (frameInstructions[frameType]) {
+      systemPrompt += `\n\n${frameInstructions[frameType]}`;
     } else {
       systemPrompt += `\n\nNO FRAME: Do not include any frame around the painting. The image should be the painting itself without any border or frame.`;
     }
@@ -127,6 +181,16 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
       : "";
 
     const fullPrompt = systemPrompt + userStylePreferences;
+
+    // Convert aspect ratios to actual frame ratios
+    // 9:16 → 3:4 for portrait (9:12 ratio)
+    // 16:9 → 4:3 for landscape (12:9 ratio)
+    const actualAspectRatio =
+      aspectRatio === "9:16"
+        ? "3:4"
+        : aspectRatio === "16:9"
+        ? "4:3"
+        : aspectRatio;
 
     // Try Nano Banana Pro first, then Nano Banana
     let response;
@@ -151,7 +215,17 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
         config: {
           responseModalities: ["TEXT", "IMAGE"],
           imageConfig: {
-            aspectRatio: aspectRatio as "1:1" | "16:9" | "9:16" | "2:3" | "3:2" | "3:4" | "4:3" | "4:5" | "5:4" | "21:9",
+            aspectRatio: actualAspectRatio as
+              | "1:1"
+              | "16:9"
+              | "9:16"
+              | "2:3"
+              | "3:2"
+              | "3:4"
+              | "4:3"
+              | "4:5"
+              | "5:4"
+              | "21:9",
             imageSize: "2K", // High quality
           },
         },
@@ -183,7 +257,17 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
           config: {
             responseModalities: ["TEXT", "IMAGE"],
             imageConfig: {
-              aspectRatio: aspectRatio as "1:1" | "16:9" | "9:16" | "2:3" | "3:2" | "3:4" | "4:3" | "4:5" | "5:4" | "21:9",
+              aspectRatio: actualAspectRatio as
+                | "1:1"
+                | "16:9"
+                | "9:16"
+                | "2:3"
+                | "3:2"
+                | "3:4"
+                | "4:3"
+                | "4:5"
+                | "5:4"
+                | "21:9",
             },
           },
         });
@@ -232,7 +316,7 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
         const randomSuffix = Math.random().toString(36).substring(2, 9);
         const folderName = `painting-${timestamp}-${randomSuffix}`;
         const paintingFolder = join(storageDir, folderName);
-        
+
         // Create folder for this painting
         await mkdir(paintingFolder, { recursive: true });
 
@@ -243,18 +327,24 @@ REQUIRED WATERCOLOR PAINTING STYLE (STRICTLY ENFORCED):
           if (ext === "jpeg") return "jpg";
           return ext;
         };
-        
+
         const originalExt = getNormalizedExt(mimeType);
         const generatedExt = getNormalizedExt(generatedImageMimeType);
 
         // Save original uploaded image
         const originalImageBuffer = Buffer.from(base64Image, "base64");
-        const originalFilePath = join(paintingFolder, `original.${originalExt}`);
+        const originalFilePath = join(
+          paintingFolder,
+          `original.${originalExt}`
+        );
         await writeFile(originalFilePath, originalImageBuffer);
 
         // Save generated painting image
         const generatedImageBuffer = Buffer.from(generatedImageData, "base64");
-        const generatedFilePath = join(paintingFolder, `generated.${generatedExt}`);
+        const generatedFilePath = join(
+          paintingFolder,
+          `generated.${generatedExt}`
+        );
         await writeFile(generatedFilePath, generatedImageBuffer);
 
         // Create URL paths for the saved images
