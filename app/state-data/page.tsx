@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
-const stateData = [
+// Combined data from call logs and state data
+const allData = [
   {
     property_id: "5424086645",
     date_scrapped: "2025-12-21 7:13",
     date_listed: "2025-09-30 2:50",
-    image_URL: "https://ap.rdcpix.com/3e066d33987a2e41ad84bec28568891fl-m695857921rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/3e066d33987a2e41ad84bec28568891fl-m695857921rd.jpg",
     price: "$829,000",
     address: "3 Julia Ln",
     city: "Hazlet",
     state: "NJ",
     zip: "07730",
+    agent_name: "Lisa Alaimo",
+    agent_email: "lisaalaimo@verizon.net",
+    phone1: "7325833333",
+    phone2: "7322414588",
     is_pending: "TRUE",
     is_contingent: "",
     status: "On Hubspot",
@@ -24,12 +30,16 @@ const stateData = [
     property_id: "5605043581",
     date_scrapped: "2025-12-21 7:13",
     date_listed: "2022-04-23 2:45",
-    image_URL: "https://ap.rdcpix.com/8212ec04512c31031ad5b2be04b33efbl-b2425240304rd.jpg",
+    image_URL: "",
     price: "$549,999",
     address: "283 Gordon Rd",
     city: "Old Bridge",
     state: "NJ",
     zip: "07747",
+    agent_name: "",
+    agent_email: "",
+    phone1: "",
+    phone2: "",
     is_pending: "",
     is_contingent: "TRUE",
     status: "for_sale",
@@ -41,12 +51,17 @@ const stateData = [
     property_id: "5144151335",
     date_scrapped: "2025-12-21 7:13",
     date_listed: "2025-12-16 20:36",
-    image_URL: "https://ap.rdcpix.com/527b509d0325784a59a86fe48f50ffbdl-m878269421rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/527b509d0325784a59a86fe48f50ffbdl-m878269421rd.jpg",
     price: "$649,900",
     address: "898 Chesterfield Rd",
     city: "Haddonfield",
     state: "NJ",
     zip: "08033",
+    agent_name: "Juliana Montalvo",
+    agent_email: "jrosemontalvo@gmail.com",
+    phone1: "6092257075",
+    phone2: "8562854998",
     is_pending: "",
     is_contingent: "TRUE",
     status: "On Hubspot",
@@ -58,12 +73,17 @@ const stateData = [
     property_id: "5509918151",
     date_scrapped: "2025-12-21 7:13",
     date_listed: "2025-12-04 3:02",
-    image_URL: "https://ap.rdcpix.com/df7d3be154e6e07b32e53c23ceabd20al-b443294202rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/df7d3be154e6e07b32e53c23ceabd20al-b443294202rd.jpg",
     price: "$550,000",
     address: "44 Shirley Blvd",
     city: "Old Bridge",
     state: "NJ",
     zip: "08857",
+    agent_name: "Brenda Foley",
+    agent_email: "",
+    phone1: "7322543750",
+    phone2: "7327423503",
     is_pending: "",
     is_contingent: "TRUE",
     status: "On Hubspot",
@@ -73,14 +93,19 @@ const stateData = [
   },
   {
     property_id: "5851589982",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-20 7:13",
     date_listed: "2025-10-14 20:30",
-    image_URL: "https://ap.rdcpix.com/3216727bfab271769119d146320ad001l-m1972337617rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/3216727bfab271769119d146320ad001l-m1972337617rd.jpg",
     price: "$735,000",
     address: "21 Shoshone St",
     city: "Old Bridge",
     state: "NJ",
     zip: "08857",
+    agent_name: "Ellen Rosenbaum",
+    agent_email: "leads@ellenrosenbaum.com",
+    phone1: "",
+    phone2: "",
     is_pending: "",
     is_contingent: "TRUE",
     status: "for_sale",
@@ -90,14 +115,18 @@ const stateData = [
   },
   {
     property_id: "5112936262",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-25 7:13",
     date_listed: "2025-12-05 20:50",
-    image_URL: "https://ap.rdcpix.com/68f4be985ca35aa66f539986dfadcdb7l-b560218544rd.jpg",
+    image_URL: "",
     price: "$575,000",
     address: "560 W Lincoln Ave",
     city: "Oakhurst",
     state: "NJ",
     zip: "07755",
+    agent_name: "Alexis Siciliano",
+    agent_email: "asiciliano104@gmail.com",
+    phone1: "7329969269",
+    phone2: "7326951600",
     is_pending: "TRUE",
     is_contingent: "",
     status: "On Hubspot",
@@ -107,14 +136,19 @@ const stateData = [
   },
   {
     property_id: "6041497041",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-25 7:13",
     date_listed: "2025-12-02 15:35",
-    image_URL: "https://ap.rdcpix.com/ffe7e3d68bdcfc4e8a4ec7abd9495cc8l-m3605437886rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/ffe7e3d68bdcfc4e8a4ec7abd9495cc8l-m3605437886rd.jpg",
     price: "$999,000",
     address: "1152 Johnston Dr",
     city: "Watchung",
     state: "NJ",
     zip: "07069",
+    agent_name: "Russell Williams",
+    agent_email: "",
+    phone1: "7326724135",
+    phone2: "9087534450",
     is_pending: "TRUE",
     is_contingent: "",
     status: "On Hubspot",
@@ -124,14 +158,19 @@ const stateData = [
   },
   {
     property_id: "6312696223",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-25 7:13",
     date_listed: "2025-11-18 21:31",
-    image_URL: "https://ap.rdcpix.com/4558df8066b1babd7bb0f5a47a350960l-m925204715rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/4558df8066b1babd7bb0f5a47a350960l-m925204715rd.jpg",
     price: "$1,200,000",
     address: "205 Sherwin Rd",
     city: "Mullica Hill",
     state: "NJ",
     zip: "08062",
+    agent_name: "Michael Martinetti",
+    agent_email: "michael@michaelmartinettigroup.com",
+    phone1: "9085900236",
+    phone2: "9085900236",
     is_pending: "TRUE",
     is_contingent: "",
     status: "On Hubspot",
@@ -139,16 +178,22 @@ const stateData = [
     sold_date: "2019-01-23",
     sold_price: "585465",
   },
+  // Add more data with today's date and recent dates
   {
     property_id: "5720215459",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-25 7:13",
     date_listed: "2025-11-08 14:34",
-    image_URL: "https://ap.rdcpix.com/85c41e6e3032533a4b3ca1ce4b2e4254l-b467891778rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/85c41e6e3032533a4b3ca1ce4b2e4254l-b467891778rd.jpg",
     price: "$669,900",
     address: "6 Brookvale Ter",
     city: "Kinnelon",
     state: "NJ",
     zip: "07405",
+    agent_name: "Mark McKenna",
+    agent_email: "mark.mckenna@exprealty.com",
+    phone1: "6093320792",
+    phone2: "6093320792",
     is_pending: "TRUE",
     is_contingent: "",
     status: "On Hubspot",
@@ -158,14 +203,18 @@ const stateData = [
   },
   {
     property_id: "5693464290",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-25 7:13",
     date_listed: "2025-08-20 22:16",
-    image_URL: "https://ap.rdcpix.com/97a744c1b2fd1a0b2f994a9e157320dbl-m2995043129rd.jpg",
+    image_URL: "",
     price: "$625,000",
     address: "24 Lonczak Ln",
     city: "East Brunswick",
     state: "NJ",
     zip: "08816",
+    agent_name: "Anthony Nelson",
+    agent_email: "anthony.nelson@coldwellbankermoves.com",
+    phone1: "",
+    phone2: "",
     is_pending: "",
     is_contingent: "TRUE",
     status: "On Hubspot",
@@ -175,14 +224,19 @@ const stateData = [
   },
   {
     property_id: "9905377318",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-23 7:13",
     date_listed: "2025-11-10 22:01",
-    image_URL: "https://ap.rdcpix.com/5624a95d0826a2de15cc305e3528e9c5l-m1268196863rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/5624a95d0826a2de15cc305e3528e9c5l-m1268196863rd.jpg",
     price: "$925,000",
     address: "108 Lincoln Ave",
     city: "Highland Park",
     state: "NJ",
     zip: "08904",
+    agent_name: "Robert Gavura",
+    agent_email: "rob.gavura@christiesrennj.com",
+    phone1: "2016538488",
+    phone2: "",
     is_pending: "",
     is_contingent: "TRUE",
     status: "On Hubspot",
@@ -192,14 +246,19 @@ const stateData = [
   },
   {
     property_id: "5905802482",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-22 7:13",
     date_listed: "2025-10-22 16:32",
-    image_URL: "https://ap.rdcpix.com/0fa4bcaebf4a9911119689c09057235dl-b3921487696rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/0fa4bcaebf4a9911119689c09057235dl-b3921487696rd.jpg",
     price: "$679,900",
     address: "51 S Brook Dr",
     city: "Milltown",
     state: "NJ",
     zip: "08850",
+    agent_name: "Peter Riga",
+    agent_email: "",
+    phone1: "7327158195",
+    phone2: "7322541700",
     is_pending: "",
     is_contingent: "TRUE",
     status: "On Hubspot",
@@ -209,14 +268,19 @@ const stateData = [
   },
   {
     property_id: "5015929224",
-    date_scrapped: "2025-12-21 7:13",
+    date_scrapped: "2025-12-20 7:13",
     date_listed: "2025-11-21 8:09",
-    image_URL: "https://ap.rdcpix.com/28512f1bcf6242401146127398956086l-b2813369672rd.jpg",
+    image_URL:
+      "https://ap.rdcpix.com/28512f1bcf6242401146127398956086l-b2813369672rd.jpg",
     price: "$525,000",
     address: "10 Lily St",
     city: "Sayreville",
     state: "NJ",
     zip: "08859",
+    agent_name: "",
+    agent_email: "test@example.com",
+    phone1: "",
+    phone2: "",
     is_pending: "",
     is_contingent: "TRUE",
     status: "On Hubspot",
@@ -224,190 +288,460 @@ const stateData = [
     sold_date: "2004-04-15",
     sold_price: "192000",
   },
-  {
-    property_id: "6633102805",
-    date_scrapped: "2025-12-21 7:13",
-    date_listed: "2025-11-09 13:45",
-    image_URL: "https://ap.rdcpix.com/44e01b89a48cafbacef28b14564de762l-m3424203975rd.jpg",
-    price: "$647,000",
-    address: "551 Rosewood Dr Unit 551R",
-    city: "Lacey",
-    state: "NJ",
-    zip: "08734",
-    is_pending: "",
-    is_contingent: "TRUE",
-    status: "On Hubspot",
-    year_built: "1972",
-    sold_date: "2010-07-30",
-    sold_price: "286000",
-  },
-  {
-    property_id: "5378816749",
-    date_scrapped: "2025-12-21 7:13",
-    date_listed: "2025-04-15 14:32",
-    image_URL: "https://ap.rdcpix.com/e571822e5eac3a3a18d312e5788c74c6l-m275581712rd.jpg",
-    price: "$525,000",
-    address: "1986 Greentree Rd",
-    city: "Cherry Hill",
-    state: "NJ",
-    zip: "08003",
-    is_pending: "",
-    is_contingent: "TRUE",
-    status: "On Hubspot",
-    year_built: "1986",
-    sold_date: "2013-11-27",
-    sold_price: "256000",
-  },
 ];
 
-const states = ["All", "California", "New Jersey"];
+type DateRange = "TODAY" | "WEEKLY" | "MONTHLY" | "YR";
+type DataType = "ALL" | "GOOD" | "BAD";
 
 export default function StateDataPage() {
-  const [selectedState, setSelectedState] = useState("All");
+  const [selectedState, setSelectedState] = useState("NJ");
+  const [dateRange, setDateRange] = useState<DateRange>("MONTHLY"); // Default to MONTHLY to show more data
+  const [dataType, setDataType] = useState<DataType>("ALL");
 
-  const filteredData =
-    selectedState === "All"
-      ? stateData
-      : stateData.filter((item) => item.state === (selectedState === "New Jersey" ? "NJ" : "CA"));
+  // Filter data based on date range
+  const getDateFilteredData = (data: typeof allData) => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    today.setHours(0, 0, 0, 0);
+
+    return data.filter((item) => {
+      try {
+        const dateStr = item.date_scrapped.split(" ")[0];
+        const [year, month, day] = dateStr.split("-").map(Number);
+        const scrapedDate = new Date(year, month - 1, day);
+        scrapedDate.setHours(0, 0, 0, 0);
+
+        switch (dateRange) {
+          case "TODAY":
+            return scrapedDate.getTime() === today.getTime();
+          case "WEEKLY":
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return scrapedDate >= weekAgo;
+          case "MONTHLY":
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return scrapedDate >= monthAgo;
+          case "YR":
+            const yearAgo = new Date(today);
+            yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+            return scrapedDate >= yearAgo;
+          default:
+            return true;
+        }
+      } catch (error) {
+        // If date parsing fails, include the item for safety
+        return true;
+      }
+    });
+  };
+
+  // Determine if data is "good" (has image, email, and phone) or "bad"
+  const isGoodData = (item: (typeof allData)[0]): boolean => {
+    return !!(
+      item.image_URL &&
+      item.agent_email &&
+      (item.phone1 || item.phone2)
+    );
+  };
+
+  // Filter data based on state and data type
+  const filteredData = useMemo(() => {
+    let data = allData.filter(
+      (item) => item.state === selectedState || selectedState === "ALL"
+    );
+
+    data = getDateFilteredData(data);
+
+    if (dataType === "GOOD") {
+      data = data.filter(isGoodData);
+    } else if (dataType === "BAD") {
+      data = data.filter((item) => !isGoodData(item));
+    }
+
+    return data;
+  }, [selectedState, dateRange, dataType]);
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const allFiltered = getDateFilteredData(
+      allData.filter(
+        (item) => item.state === selectedState || selectedState === "ALL"
+      )
+    );
+
+    const goodData = allFiltered.filter(isGoodData);
+    const badData = allFiltered.filter((item) => !isGoodData(item));
+
+    const missingImages = allFiltered.filter((item) => !item.image_URL);
+    const missingEmail = allFiltered.filter((item) => !item.agent_email);
+    const missingPhone = allFiltered.filter(
+      (item) => !item.phone1 && !item.phone2
+    );
+
+    return {
+      goodDataCount: goodData.length,
+      badDataCount: badData.length,
+      missingImagesCount: missingImages.length,
+      missingEmailCount: missingEmail.length,
+      missingPhoneCount: missingPhone.length,
+      total: allFiltered.length,
+    };
+  }, [selectedState, dateRange]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
-              State Data
-            </h1>
-            <p className="text-gray-600">Browse property data by state</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-6 py-6">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+            {selectedState === "ALL"
+              ? "All States"
+              : `${selectedState} Dashboard`}
+          </h1>
+          <p className="text-gray-600">
+            Data quality and missing information tracking
+          </p>
+        </div>
+
+        {/* Controls Section */}
+        <div className="px-6 py-6 space-y-6">
+          {/* Date Range Selector */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Date Range
+            </label>
+            <div className="flex gap-3">
+              {(["TODAY", "WEEKLY", "MONTHLY", "YR"] as DateRange[]).map(
+                (range) => (
+                  <button
+                    key={range}
+                    onClick={() => setDateRange(range)}
+                    className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                      dateRange === range
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {range}
+                  </button>
+                )
+              )}
+            </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <label className="text-sm font-medium text-gray-700">State Selection:</label>
+
+          {/* Good/Bad Data Selector */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Data Quality
+            </label>
+            <div className="flex gap-3">
+              {(["ALL", "GOOD", "BAD"] as DataType[]).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setDataType(type)}
+                  className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                    dataType === type
+                      ? type === "GOOD"
+                        ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg shadow-green-500/50"
+                        : type === "BAD"
+                        ? "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-500/50"
+                        : "bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-lg shadow-gray-500/50"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {type === "ALL"
+                    ? "All Data"
+                    : type === "GOOD"
+                    ? "Good Data"
+                    : "Bad Data"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* State Selector */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              State Selection
+            </label>
             <select
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full max-w-xs"
             >
-              {states.map((state) => (
-                <option key={state} value={state}>
-                  {state}
-                </option>
-              ))}
+              <option value="ALL">All States</option>
+              <option value="NJ">New Jersey (NJ)</option>
+              <option value="CA">California (CA)</option>
             </select>
           </div>
-        </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Property ID
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date Scrapped
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date Listed
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Image
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Address
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    City
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    State
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Zip
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Pending
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contingent
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Year Built
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sold Date
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sold Price
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((property) => (
-                  <tr key={property.property_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.property_id}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.date_scrapped}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.date_listed}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <img
-                        src={property.image_URL}
-                        alt={property.address}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {property.price}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.address}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.city}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.state}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.zip}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.is_pending || "-"}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.is_contingent || "-"}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.status}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.year_built || "-"}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.sold_date || "-"}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      {property.sold_price ? `$${property.sold_price}` : "-"}
-                    </td>
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Good Data Scraped */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-sm border border-green-200 p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-green-700">
+                  Good Data
+                </span>
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div className="text-3xl font-bold text-green-900">
+                {stats.goodDataCount}
+              </div>
+              <div className="text-xs text-green-600 mt-1">Scraped</div>
+            </div>
+
+            {/* Bad Data Scraped */}
+            <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-sm border border-red-200 p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-red-700">
+                  Bad Data
+                </span>
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div className="text-3xl font-bold text-red-900">
+                {stats.badDataCount}
+              </div>
+              <div className="text-xs text-red-600 mt-1">Scraped</div>
+            </div>
+
+            {/* Missing Images */}
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl shadow-sm border border-orange-200 p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-orange-700">
+                  Missing Images
+                </span>
+                <svg
+                  className="w-6 h-6 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <div className="text-3xl font-bold text-orange-900">
+                {stats.missingImagesCount}
+              </div>
+              <div className="text-xs text-orange-600 mt-1">
+                {selectedState}
+              </div>
+            </div>
+
+            {/* Missing Email */}
+            <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-sm border border-yellow-200 p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-yellow-700">
+                  Missing Email
+                </span>
+                <svg
+                  className="w-6 h-6 text-yellow-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <div className="text-3xl font-bold text-yellow-900">
+                {stats.missingEmailCount}
+              </div>
+              <div className="text-xs text-yellow-600 mt-1">
+                {selectedState}
+              </div>
+            </div>
+
+            {/* Missing Phone */}
+            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl shadow-sm border border-purple-200 p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-purple-700">
+                  Missing Phone
+                </span>
+                <svg
+                  className="w-6 h-6 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
+                </svg>
+              </div>
+              <div className="text-3xl font-bold text-purple-900">
+                {stats.missingPhoneCount}
+              </div>
+              <div className="text-xs text-purple-600 mt-1">
+                {selectedState}
+              </div>
+            </div>
+          </div>
+
+          {/* Data Table */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {dataType === "ALL"
+                  ? "All Data"
+                  : dataType === "GOOD"
+                  ? "Good Data"
+                  : "Bad Data"}{" "}
+                ({filteredData.length} records)
+              </h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Property ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Image
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Address
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Agent Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Phone
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Status
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredData.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        className="px-6 py-8 text-center text-gray-500"
+                      >
+                        No data found for the selected filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredData.map((property) => (
+                      <tr
+                        key={property.property_id}
+                        className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 transition-colors duration-150"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {property.property_id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {property.image_URL ? (
+                            <img
+                              src={property.image_URL}
+                              alt={property.address}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
+                              <span className="text-xs text-gray-400">
+                                No Image
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {property.address}, {property.city}, {property.state}{" "}
+                          {property.zip}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {property.agent_name || (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {property.agent_email ? (
+                            <a
+                              href={`mailto:${property.agent_email}`}
+                              className="text-blue-600 hover:text-blue-800 hover:underline"
+                            >
+                              {property.agent_email}
+                            </a>
+                          ) : (
+                            <span className="text-red-500 font-medium">
+                              Missing
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {property.phone1 || property.phone2 ? (
+                            <span className="text-gray-900">
+                              {property.phone1 || property.phone2}
+                            </span>
+                          ) : (
+                            <span className="text-red-500 font-medium">
+                              Missing
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              isGoodData(property)
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {isGoodData(property) ? "Good" : "Bad"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
