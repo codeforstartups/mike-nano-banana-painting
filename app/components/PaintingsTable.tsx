@@ -34,34 +34,34 @@ export default function PaintingsTable({ paintings }: PaintingsTableProps) {
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-200/80 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-100">
+            <thead className="bg-gray-50/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  S.N.
+                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  #
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Original Painting
+                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Original
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Generated Painting
+                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Generated
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Download
+                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-100">
               {paintings.length === 0 ? (
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-8 text-center text-gray-500"
+                    className="px-6 py-12 text-center text-gray-400 text-sm"
                   >
                     No paintings generated yet.
                   </td>
