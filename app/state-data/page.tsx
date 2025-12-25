@@ -390,102 +390,105 @@ export default function StateDataPage() {
   }, [selectedState, dateRange]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#fafafa]">
       <div className="w-full">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+        <div className="bg-white border-b border-gray-200/80 px-6 py-6">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-1">
             {selectedState === "ALL"
               ? "All States"
               : `${selectedState} Dashboard`}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm text-gray-500">
             Data quality and missing information tracking
           </p>
         </div>
 
         {/* Controls Section */}
-        <div className="px-6 py-6 space-y-6">
-          {/* Date Range Selector */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Date Range
-            </label>
-            <div className="flex gap-3">
-              {(["TODAY", "WEEKLY", "MONTHLY", "YR"] as DateRange[]).map(
-                (range) => (
+        <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4">
+          {/* Filters Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Date Range Selector */}
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
+              <label className="block text-xs font-medium text-gray-700 mb-2.5">
+                Date Range
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {(["TODAY", "WEEKLY", "MONTHLY", "YR"] as DateRange[]).map(
+                  (range) => (
+                    <button
+                      key={range}
+                      onClick={() => setDateRange(range)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-150 ${
+                        dateRange === range
+                          ? "bg-gray-900 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {range}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Good/Bad Data Selector */}
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
+              <label className="block text-xs font-medium text-gray-700 mb-2.5">
+                Data Quality
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {(["ALL", "GOOD", "BAD"] as DataType[]).map((type) => (
                   <button
-                    key={range}
-                    onClick={() => setDateRange(range)}
-                    className={`px-6 py-2 rounded-lg font-medium transition-all ${
-                      dateRange === range
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50"
+                    key={type}
+                    onClick={() => setDataType(type)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-150 ${
+                      dataType === type
+                        ? type === "GOOD"
+                          ? "bg-green-600 text-white"
+                          : type === "BAD"
+                          ? "bg-red-600 text-white"
+                          : "bg-gray-900 text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
-                    {range}
+                    {type === "ALL"
+                      ? "All Data"
+                      : type === "GOOD"
+                      ? "Good Data"
+                      : "Bad Data"}
                   </button>
-                )
-              )}
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Good/Bad Data Selector */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Data Quality
-            </label>
-            <div className="flex gap-3">
-              {(["ALL", "GOOD", "BAD"] as DataType[]).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setDataType(type)}
-                  className={`px-6 py-2 rounded-lg font-medium transition-all ${
-                    dataType === type
-                      ? type === "GOOD"
-                        ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg shadow-green-500/50"
-                        : type === "BAD"
-                        ? "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-lg shadow-red-500/50"
-                        : "bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-lg shadow-gray-500/50"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {type === "ALL"
-                    ? "All Data"
-                    : type === "GOOD"
-                    ? "Good Data"
-                    : "Bad Data"}
-                </button>
-              ))}
+            {/* State Selector */}
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
+              <label className="block text-xs font-medium text-gray-700 mb-2.5">
+                State Selection
+              </label>
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all bg-white"
+              >
+                <option value="ALL">All States</option>
+                <option value="NJ">New Jersey (NJ)</option>
+                <option value="CA">California (CA)</option>
+              </select>
             </div>
-          </div>
-
-          {/* State Selector */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              State Selection
-            </label>
-            <select
-              value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full max-w-xs"
-            >
-              <option value="ALL">All States</option>
-              <option value="NJ">New Jersey (NJ)</option>
-              <option value="CA">California (CA)</option>
-            </select>
           </div>
 
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {/* Good Data Scraped */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-sm border border-green-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-green-700">
+                <span className="text-xs font-medium text-gray-600">
                   Good Data
                 </span>
                 <svg
-                  className="w-6 h-6 text-green-600"
+                  className="w-4 h-4 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -498,20 +501,20 @@ export default function StateDataPage() {
                   />
                 </svg>
               </div>
-              <div className="text-3xl font-bold text-green-900">
+              <div className="text-2xl font-semibold text-gray-900">
                 {stats.goodDataCount}
               </div>
-              <div className="text-xs text-green-600 mt-1">Scraped</div>
+              <div className="text-xs text-gray-500 mt-0.5">Scraped</div>
             </div>
 
             {/* Bad Data Scraped */}
-            <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-sm border border-red-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-red-700">
+                <span className="text-xs font-medium text-gray-600">
                   Bad Data
                 </span>
                 <svg
-                  className="w-6 h-6 text-red-600"
+                  className="w-4 h-4 text-red-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -524,20 +527,20 @@ export default function StateDataPage() {
                   />
                 </svg>
               </div>
-              <div className="text-3xl font-bold text-red-900">
+              <div className="text-2xl font-semibold text-gray-900">
                 {stats.badDataCount}
               </div>
-              <div className="text-xs text-red-600 mt-1">Scraped</div>
+              <div className="text-xs text-gray-500 mt-0.5">Scraped</div>
             </div>
 
             {/* Missing Images */}
-            <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl shadow-sm border border-orange-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-orange-700">
+                <span className="text-xs font-medium text-gray-600">
                   Missing Images
                 </span>
                 <svg
-                  className="w-6 h-6 text-orange-600"
+                  className="w-4 h-4 text-orange-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -550,22 +553,22 @@ export default function StateDataPage() {
                   />
                 </svg>
               </div>
-              <div className="text-3xl font-bold text-orange-900">
+              <div className="text-2xl font-semibold text-gray-900">
                 {stats.missingImagesCount}
               </div>
-              <div className="text-xs text-orange-600 mt-1">
+              <div className="text-xs text-gray-500 mt-0.5">
                 {selectedState}
               </div>
             </div>
 
             {/* Missing Email */}
-            <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-sm border border-yellow-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-yellow-700">
+                <span className="text-xs font-medium text-gray-600">
                   Missing Email
                 </span>
                 <svg
-                  className="w-6 h-6 text-yellow-600"
+                  className="w-4 h-4 text-yellow-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -578,22 +581,22 @@ export default function StateDataPage() {
                   />
                 </svg>
               </div>
-              <div className="text-3xl font-bold text-yellow-900">
+              <div className="text-2xl font-semibold text-gray-900">
                 {stats.missingEmailCount}
               </div>
-              <div className="text-xs text-yellow-600 mt-1">
+              <div className="text-xs text-gray-500 mt-0.5">
                 {selectedState}
               </div>
             </div>
 
             {/* Missing Phone */}
-            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl shadow-sm border border-purple-200 p-6">
+            <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-purple-700">
+                <span className="text-xs font-medium text-gray-600">
                   Missing Phone
                 </span>
                 <svg
-                  className="w-6 h-6 text-purple-600"
+                  className="w-4 h-4 text-purple-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -606,60 +609,62 @@ export default function StateDataPage() {
                   />
                 </svg>
               </div>
-              <div className="text-3xl font-bold text-purple-900">
+              <div className="text-2xl font-semibold text-gray-900">
                 {stats.missingPhoneCount}
               </div>
-              <div className="text-xs text-purple-600 mt-1">
+              <div className="text-xs text-gray-500 mt-0.5">
                 {selectedState}
               </div>
             </div>
           </div>
 
           {/* Data Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <h2 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm overflow-hidden">
+            <div className="px-4 sm:px-6 py-3.5 border-b border-gray-100 bg-gray-50/50">
+              <h2 className="text-sm font-semibold text-gray-900">
                 {dataType === "ALL"
                   ? "All Data"
                   : dataType === "GOOD"
                   ? "Good Data"
                   : "Bad Data"}{" "}
-                ({filteredData.length} records)
+                <span className="text-gray-500 font-normal">
+                  ({filteredData.length} records)
+                </span>
               </h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+              <table className="min-w-full divide-y divide-gray-100">
+                <thead className="bg-gray-50/50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Property ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Image
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Address
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Agent Name
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Phone
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Status
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-100">
                   {filteredData.length === 0 ? (
                     <tr>
                       <td
                         colSpan={7}
-                        className="px-6 py-8 text-center text-gray-500"
+                        className="px-4 sm:px-6 py-12 text-center text-gray-400 text-sm"
                       >
                         No data found for the selected filters.
                       </td>
@@ -668,36 +673,38 @@ export default function StateDataPage() {
                     filteredData.map((property) => (
                       <tr
                         key={property.property_id}
-                        className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 transition-colors duration-150"
+                        className="hover:bg-gray-50/50 transition-colors duration-150"
                       >
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
                           {property.property_id}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                           {property.image_URL ? (
                             <img
                               src={property.image_URL}
                               alt={property.address}
-                              className="w-16 h-16 object-cover rounded"
+                              className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-md"
                             />
                           ) : (
-                            <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-md flex items-center justify-center">
                               <span className="text-xs text-gray-400">
                                 No Image
                               </span>
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {property.address}, {property.city}, {property.state}{" "}
-                          {property.zip}
+                        <td className="px-4 sm:px-6 py-4 text-sm text-gray-600">
+                          <div className="max-w-xs truncate">
+                            {property.address}, {property.city},{" "}
+                            {property.state} {property.zip}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                           {property.agent_name || (
                             <span className="text-gray-400">-</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">
                           {property.agent_email ? (
                             <a
                               href={`mailto:${property.agent_email}`}
@@ -706,25 +713,25 @@ export default function StateDataPage() {
                               {property.agent_email}
                             </a>
                           ) : (
-                            <span className="text-red-500 font-medium">
+                            <span className="text-red-500 text-xs font-medium">
                               Missing
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">
                           {property.phone1 || property.phone2 ? (
-                            <span className="text-gray-900">
+                            <span className="text-gray-600">
                               {property.phone1 || property.phone2}
                             </span>
                           ) : (
-                            <span className="text-red-500 font-medium">
+                            <span className="text-red-500 text-xs font-medium">
                               Missing
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
                               isGoodData(property)
                                 ? "bg-green-100 text-green-700"
                                 : "bg-red-100 text-red-700"

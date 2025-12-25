@@ -21,12 +21,12 @@ export default function PaintingTableRow({
 }: PaintingTableRowProps) {
   return (
     <tr className="hover:bg-gray-50/50 transition-colors duration-150">
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
+      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500 align-middle">
         {index + 1}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-4 sm:px-6 py-4 whitespace-nowrap align-middle">
         <div
-          className="w-20 h-20 relative bg-gray-100 rounded-md cursor-pointer hover:ring-2 hover:ring-gray-300 transition-all duration-200 overflow-hidden group"
+          className="w-20 h-20 relative bg-gray-100 rounded-lg cursor-pointer hover:ring-2 hover:ring-gray-300 hover:shadow-sm transition-all duration-200 overflow-hidden group"
           onClick={() => {
             if (originalImageUrl) {
               onImageClick(originalImageUrl, "Original image");
@@ -38,7 +38,7 @@ export default function PaintingTableRow({
               src={originalImageUrl}
               alt="Original"
               fill
-              className="object-cover rounded-md group-hover:scale-105 transition-transform duration-200"
+              className="object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
             />
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400 text-xs">
@@ -47,10 +47,10 @@ export default function PaintingTableRow({
           )}
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-4 sm:px-6 py-4 whitespace-nowrap align-middle">
         {generatedImageUrl ? (
           <div
-            className="w-20 h-20 relative bg-gray-100 rounded-md cursor-pointer hover:ring-2 hover:ring-gray-300 transition-all duration-200 overflow-hidden group"
+            className="w-20 h-20 relative bg-gray-100 rounded-lg cursor-pointer hover:ring-2 hover:ring-gray-300 hover:shadow-sm transition-all duration-200 overflow-hidden group"
             onClick={() =>
               onImageClick(generatedImageUrl, "Generated painting")
             }
@@ -59,24 +59,24 @@ export default function PaintingTableRow({
               src={generatedImageUrl}
               alt="Generated"
               fill
-              className="object-cover rounded-md group-hover:scale-105 transition-transform duration-200"
+              className="object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
             />
           </div>
         ) : (
-          <div className="w-20 h-20 relative bg-gray-100 rounded-md flex items-center justify-center text-gray-400 text-xs">
+          <div className="w-20 h-20 relative bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs">
             N/A
           </div>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-600 align-middle">
         {createdAt}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
+      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm align-middle">
         {generatedImageUrl ? (
           <a
             href={generatedImageUrl}
             download={`generated-${folderName}`}
-            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors duration-150"
+            className="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             Download

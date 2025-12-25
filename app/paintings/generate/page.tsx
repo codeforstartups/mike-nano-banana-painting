@@ -82,10 +82,10 @@ export default function GeneratePaintingPage() {
   };
 
   return (
-    <div className="h-full bg-gray-50 overflow-hidden">
-      <div className="flex h-full">
+    <div className="h-full bg-[#fafafa] overflow-hidden">
+      <div className="flex flex-col lg:flex-row h-full">
         {/* Left Side - Image Upload and Prompt */}
-        <div className="w-1/2 border-r border-gray-200 p-6 overflow-hidden flex flex-col">
+        <div className="w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-gray-200/80 p-4 sm:p-6 overflow-y-auto flex flex-col">
           <ImageUpload
             onImageUpload={handleImageUpload}
             userPrompt={userPrompt}
@@ -99,7 +99,7 @@ export default function GeneratePaintingPage() {
         </div>
 
         {/* Right Side - Generated Painting Display */}
-        <div className="w-1/2 p-6 overflow-hidden flex flex-col">
+        <div className="w-full lg:w-1/2 p-4 sm:p-6 overflow-y-auto flex flex-col">
           <PaintingDisplay
             paintingUrl={generatedPainting}
             description={paintingDescription}

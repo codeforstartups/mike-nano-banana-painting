@@ -34,24 +34,33 @@ export default function PaintingsTable({ paintings }: PaintingsTableProps) {
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-gray-200/80 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm overflow-hidden">
+        <div className="px-4 sm:px-6 py-3.5 border-b border-gray-100 bg-gray-50/50">
+          <h2 className="text-sm font-semibold text-gray-900">
+            Paintings
+            <span className="text-gray-500 font-normal ml-1">
+              ({paintings.length}{" "}
+              {paintings.length === 1 ? "record" : "records"})
+            </span>
+          </h2>
+        </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gray-50/50">
+          <table className="w-full divide-y divide-gray-100">
+            <thead className="bg-white">
               <tr>
-                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  #
+                <th className="px-4 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide align-middle">
+                  Sr No.
                 </th>
-                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide align-middle">
                   Original
                 </th>
-                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide align-middle">
                   Generated
                 </th>
-                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide align-middle">
                   Created At
                 </th>
-                <th className="px-6 py-3.5 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 sm:px-6 py-3.5 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide align-middle">
                   Actions
                 </th>
               </tr>
@@ -61,7 +70,7 @@ export default function PaintingsTable({ paintings }: PaintingsTableProps) {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-12 text-center text-gray-400 text-sm"
+                    className="px-4 sm:px-6 py-12 text-center text-gray-400 text-sm"
                   >
                     No paintings generated yet.
                   </td>
@@ -92,4 +101,3 @@ export default function PaintingsTable({ paintings }: PaintingsTableProps) {
     </>
   );
 }
-

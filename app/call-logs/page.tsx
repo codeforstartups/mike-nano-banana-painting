@@ -1,7 +1,6 @@
-import { readFile } from "fs/promises";
-import { join } from "path";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { useState, useMemo, useEffect } from "react";
 
 interface CallLog {
   agency_name: string;
@@ -138,123 +137,6 @@ const existingCallLogs: CallLog[] = [
   },
 ];
 
-// Parse CSV line (handles quoted fields)
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === "," && !inQuotes) {
-      result.push(current.trim());
-      current = "";
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
-
-async function getCallLogs(): Promise<CallLog[]> {
-  try {
-    // Read CSV file
-    const csvPath = join(process.cwd(), "data", "Realtor Data-NJ - Sheet1.csv");
-    const csvContent = await readFile(csvPath, "utf-8");
-    const lines = csvContent.split("\n").filter((line) => line.trim());
-
-    if (lines.length < 2) {
-      return existingCallLogs;
-    }
-
-    // Parse header
-    const header = parseCSVLine(lines[0]);
-    const agencyNameIdx = header.indexOf("agency_name");
-    const agentNameIdx = header.indexOf("agent_name");
-    const agentEmailIdx = header.indexOf("agent_email");
-    const phone1TypeIdx = header.indexOf("phone1_type");
-    const phone1Idx = header.indexOf("phone1");
-    const phone2TypeIdx = header.indexOf("phone2_type");
-    const phone2Idx = header.indexOf("phone2");
-    const statusIdx = header.indexOf("status");
-
-    // Use a Map to store unique entries (keyed by email or agency+name)
-    const uniqueLogs = new Map<string, CallLog>();
-
-    // Add existing logs first
-    existingCallLogs.forEach((log) => {
-      const key = log.agent_email || `${log.agency_name}-${log.agent_name}`;
-      if (key) {
-        uniqueLogs.set(key.toLowerCase(), log);
-      }
-    });
-
-    // Parse CSV rows
-    for (let i = 1; i < lines.length; i++) {
-      const row = parseCSVLine(lines[i]);
-      if (row.length <= Math.max(agencyNameIdx, agentNameIdx, agentEmailIdx, phone1Idx)) {
-        continue;
-      }
-
-      const agencyName = row[agencyNameIdx]?.trim() || "";
-      const agentName = row[agentNameIdx]?.trim() || "";
-      const agentEmail = row[agentEmailIdx]?.trim() || "";
-      const phone1Type = row[phone1TypeIdx]?.trim() || "";
-      const phone1 = row[phone1Idx]?.trim() || "";
-      const phone2Type = row[phone2TypeIdx]?.trim() || "";
-      const phone2 = row[phone2Idx]?.trim() || "";
-      const status = row[statusIdx]?.trim() || "";
-
-      // Skip if no agency name
-      if (!agencyName) continue;
-
-      // Create key for uniqueness (prefer email, fallback to agency+name)
-      const key = agentEmail
-        ? agentEmail.toLowerCase()
-        : `${agencyName}-${agentName}`.toLowerCase();
-
-      // Only add if not already exists or if this entry has more complete data
-      if (!uniqueLogs.has(key)) {
-        uniqueLogs.set(key, {
-          agency_name: agencyName,
-          agent_name: agentName,
-          agent_email: agentEmail,
-          phone1_type: phone1Type,
-          phone1: phone1,
-          phone2_type: phone2Type,
-          phone2: phone2,
-          status: status,
-        });
-      } else {
-        // Update existing entry if this one has more complete data
-        const existing = uniqueLogs.get(key)!;
-        if (!existing.agent_email && agentEmail) {
-          existing.agent_email = agentEmail;
-        }
-        if (!existing.phone1 && phone1) {
-          existing.phone1 = phone1;
-          existing.phone1_type = phone1Type;
-        }
-        if (!existing.phone2 && phone2) {
-          existing.phone2 = phone2;
-          existing.phone2_type = phone2Type;
-        }
-        if (!existing.status && status) {
-          existing.status = status;
-        }
-      }
-    }
-
-    return Array.from(uniqueLogs.values());
-  } catch (error) {
-    console.error("Error reading CSV:", error);
-    return existingCallLogs;
-  }
-}
-
 // Format phone number to (XXX) XXX-XXXX
 function formatPhoneNumber(phone: string): string {
   if (!phone || phone.length !== 10) return phone;
@@ -269,209 +151,439 @@ function getPhoneTypeBadge(type: string): { label: string; color: string } {
     mobile: { label: "Mobile", color: "bg-blue-100 text-blue-700" },
     landline: { label: "Landline", color: "bg-green-100 text-green-700" },
     fixedVoip: { label: "Fixed VoIP", color: "bg-purple-100 text-purple-700" },
-    nonFixedVoip: { label: "Non-Fixed VoIP", color: "bg-orange-100 text-orange-700" },
+    nonFixedVoip: {
+      label: "Non-Fixed VoIP",
+      color: "bg-orange-100 text-orange-700",
+    },
     tollFree: { label: "Toll Free", color: "bg-pink-100 text-pink-700" },
   };
 
   return typeMap[type] || { label: type, color: "bg-gray-100 text-gray-600" };
 }
 
-// Get badge color for status
+// Get badge color for status (for filters)
 function getStatusBadge(status: string): { label: string; color: string } {
   if (!status) return { label: "-", color: "bg-gray-100 text-gray-500" };
 
   const statusMap: Record<string, { label: string; color: string }> = {
-    "On Hubspot": { label: "On Hubspot", color: "bg-green-100 text-green-700" },
-    "for_sale": { label: "For Sale", color: "bg-blue-100 text-blue-700" },
+    "On Hubspot": { label: "On Hubspot", color: "bg-gray-900 text-white" },
+    for_sale: { label: "For Sale", color: "bg-gray-800 text-white" },
   };
 
-  return statusMap[status] || { label: status, color: "bg-gray-100 text-gray-600" };
+  return (
+    statusMap[status] || { label: status, color: "bg-gray-100 text-gray-700" }
+  );
 }
 
-export default async function CallLogsPage() {
-  const callLogs = await getCallLogs();
+// Get badge color for status in table (better contrast and differentiation)
+function getTableStatusBadge(status: string): { label: string; color: string } {
+  if (!status)
+    return {
+      label: "-",
+      color: "bg-gray-50 text-gray-400 border border-gray-200",
+    };
+
+  const statusMap: Record<string, { label: string; color: string }> = {
+    "On Hubspot": {
+      label: "On Hubspot",
+      color: "bg-gray-50 text-gray-900 border border-gray-300 font-medium",
+    },
+    for_sale: {
+      label: "For Sale",
+      color: "bg-gray-100 text-gray-800 border border-gray-400 font-medium",
+    },
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    statusMap[status] || {
+      label: status,
+      color: "bg-gray-50 text-gray-600 border border-gray-200",
+    }
+  );
+}
+
+export default function CallLogsPage() {
+  const [callLogs, setCallLogs] = useState<CallLog[]>(existingCallLogs);
+  const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCallLogs() {
+      try {
+        const response = await fetch("/api/call-logs");
+        const logs = await response.json();
+        setCallLogs(logs);
+      } catch (error) {
+        console.error("Error loading call logs:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadCallLogs();
+  }, []);
+
+  // Get unique statuses from call logs
+  const uniqueStatuses = useMemo(() => {
+    const statuses = new Set<string>();
+    callLogs.forEach((log) => {
+      if (log.status) {
+        statuses.add(log.status);
+      }
+    });
+    return Array.from(statuses).sort();
+  }, [callLogs]);
+
+  // Filter call logs by status and search query
+  const filteredLogs = useMemo(() => {
+    let filtered = callLogs;
+
+    // Filter by status
+    if (selectedStatus !== "ALL") {
+      filtered = filtered.filter((log) => log.status === selectedStatus);
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter((log) => {
+        const searchFields = [
+          log.agency_name,
+          log.agent_name,
+          log.agent_email,
+          log.phone1,
+          log.phone2,
+          formatPhoneNumber(log.phone1),
+          formatPhoneNumber(log.phone2),
+          log.status,
+        ]
+          .filter(Boolean)
+          .map((field) => field?.toLowerCase() || "");
+
+        return searchFields.some((field) => field.includes(query));
+      });
+    }
+
+    return filtered;
+  }, [callLogs, selectedStatus, searchQuery]);
+
+  return (
+    <div className="min-h-screen bg-[#fafafa]">
       <div className="w-full">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+        <div className="bg-white border-b border-gray-200/80 px-4 sm:px-6 py-6">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-1">
             Call Logs
           </h1>
-          <p className="text-gray-600">View and manage agent call logs</p>
+          <p className="text-sm text-gray-500">
+            View and manage agent call logs
+          </p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="px-4 sm:px-6 py-4">
+          <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm p-5">
+            <div className="flex flex-col lg:flex-row lg:items-end gap-4">
+              {/* Search Bar - Takes priority */}
+              <div className="flex-1 min-w-0">
+                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                  Search
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <svg
+                      className="h-4 w-4 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by agency, agent name, email, phone, or status..."
+                    className="block w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all bg-white placeholder:text-gray-400"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center hover:opacity-70 transition-opacity"
+                      aria-label="Clear search"
+                    >
+                      <svg
+                        className="h-4 w-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Status Filter */}
+              <div className="lg:flex-shrink-0">
+                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                  Status
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedStatus("ALL")}
+                    className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                      selectedStatus === "ALL"
+                        ? "bg-gray-900 text-white shadow-sm"
+                        : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    All
+                  </button>
+                  {uniqueStatuses.map((status) => {
+                    const badge = getStatusBadge(status);
+                    return (
+                      <button
+                        key={status}
+                        onClick={() => setSelectedStatus(status)}
+                        className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                          selectedStatus === status
+                            ? "bg-gray-900 text-white shadow-sm"
+                            : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
+                        }`}
+                      >
+                        {badge.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Table Container */}
-        <div className="px-6 py-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="px-4 sm:px-6 pb-6">
+          <div className="bg-white rounded-lg border border-gray-200/80 shadow-sm overflow-hidden">
+            <div className="px-4 sm:px-6 py-3.5 border-b border-gray-100 bg-gray-50/50">
+              <h2 className="text-sm font-semibold text-gray-900">
+                Call Logs
+                <span className="text-gray-500 font-normal ml-1">
+                  ({filteredLogs.length} records)
+                </span>
+              </h2>
+            </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+              <table className="w-full divide-y divide-gray-100 table-fixed">
+                <colgroup>
+                  <col className="w-[22.22%]" />
+                  <col className="w-[22.22%]" />
+                  <col className="w-[22.22%]" />
+                  <col className="w-[11.11%]" />
+                  <col className="w-[11.11%]" />
+                  <col className="w-[11.11%]" />
+                </colgroup>
+                <thead className="bg-gray-50/50">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider align-middle">
                       Agency Name
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider align-middle">
                       Agent Name
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider align-middle">
                       Agent Email
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider align-middle">
                       Primary Phone
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider align-middle">
                       Secondary Phone
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider align-middle">
                       Status
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {callLogs.map((log, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 transition-colors duration-150"
-                    >
-                      {/* Agency Name */}
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-semibold text-gray-900">
-                          {log.agency_name || (
-                            <span className="text-gray-400 italic">Not available</span>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Agent Name */}
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
-                          {log.agent_name || (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Agent Email */}
-                      <td className="px-6 py-4">
-                        {log.agent_email ? (
-                          <a
-                            href={`mailto:${log.agent_email}`}
-                            className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                              />
-                            </svg>
-                            {log.agent_email}
-                          </a>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
-                      </td>
-
-                      {/* Primary Phone */}
-                      <td className="px-6 py-4">
-                        {log.phone1 ? (
-                          <div className="space-y-1">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                getPhoneTypeBadge(log.phone1_type).color
-                              }`}
-                            >
-                              {getPhoneTypeBadge(log.phone1_type).label}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <svg
-                                className="w-4 h-4 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                />
-                              </svg>
-                              <a
-                                href={`tel:${log.phone1}`}
-                                className="text-sm font-medium text-gray-900 hover:text-blue-600"
-                              >
-                                {formatPhoneNumber(log.phone1)}
-                              </a>
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
-                      </td>
-
-                      {/* Secondary Phone */}
-                      <td className="px-6 py-4">
-                        {log.phone2 ? (
-                          <div className="space-y-1">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                getPhoneTypeBadge(log.phone2_type).color
-                              }`}
-                            >
-                              {getPhoneTypeBadge(log.phone2_type).label}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <svg
-                                className="w-4 h-4 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                />
-                              </svg>
-                              <a
-                                href={`tel:${log.phone2}`}
-                                className="text-sm font-medium text-gray-900 hover:text-blue-600"
-                              >
-                                {formatPhoneNumber(log.phone2)}
-                              </a>
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-6 py-4">
-                        {log.status ? (
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              getStatusBadge(log.status).color
-                            }`}
-                          >
-                            {getStatusBadge(log.status).label}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
+                <tbody className="bg-white divide-y divide-gray-100">
+                  {isLoading ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="px-4 sm:px-6 py-12 text-center text-gray-400 text-sm"
+                      >
+                        Loading call logs...
                       </td>
                     </tr>
-                  ))}
+                  ) : filteredLogs.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="px-4 sm:px-6 py-12 text-center text-gray-400 text-sm"
+                      >
+                        No call logs found for the selected status.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredLogs.map((log, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-gray-50/50 transition-colors duration-150"
+                      >
+                        {/* Agency Name */}
+                        <td className="px-4 sm:px-6 py-4 align-middle">
+                          <div className="text-sm font-medium text-gray-900">
+                            {log.agency_name || (
+                              <span className="text-gray-400">
+                                Not available
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Agent Name */}
+                        <td className="px-4 sm:px-6 py-4 align-middle">
+                          <div className="text-sm text-gray-600">
+                            {log.agent_name || (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Agent Email */}
+                        <td className="px-4 sm:px-6 py-4 align-middle">
+                          {log.agent_email ? (
+                            <a
+                              href={`mailto:${log.agent_email}`}
+                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1.5"
+                            >
+                              <svg
+                                className="w-3.5 h-3.5 flex-shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                />
+                              </svg>
+                              <span className="truncate max-w-[200px]">
+                                {log.agent_email}
+                              </span>
+                            </a>
+                          ) : (
+                            <span className="text-sm text-gray-400">-</span>
+                          )}
+                        </td>
+
+                        {/* Primary Phone */}
+                        <td className="px-4 sm:px-6 py-4 align-middle">
+                          {log.phone1 ? (
+                            <div className="flex flex-col gap-1.5">
+                              <span
+                                className={`inline-flex items-center w-fit px-2 py-0.5 rounded-md text-xs font-medium ${
+                                  getPhoneTypeBadge(log.phone1_type).color
+                                }`}
+                              >
+                                {getPhoneTypeBadge(log.phone1_type).label}
+                              </span>
+                              <div className="flex items-center gap-1.5">
+                                <svg
+                                  className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                  />
+                                </svg>
+                                <a
+                                  href={`tel:${log.phone1}`}
+                                  className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                                >
+                                  {formatPhoneNumber(log.phone1)}
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">-</span>
+                          )}
+                        </td>
+
+                        {/* Secondary Phone */}
+                        <td className="px-4 sm:px-6 py-4 align-middle">
+                          {log.phone2 ? (
+                            <div className="flex flex-col gap-1.5">
+                              <span
+                                className={`inline-flex items-center w-fit px-2 py-0.5 rounded-md text-xs font-medium ${
+                                  getPhoneTypeBadge(log.phone2_type).color
+                                }`}
+                              >
+                                {getPhoneTypeBadge(log.phone2_type).label}
+                              </span>
+                              <div className="flex items-center gap-1.5">
+                                <svg
+                                  className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                  />
+                                </svg>
+                                <a
+                                  href={`tel:${log.phone2}`}
+                                  className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                                >
+                                  {formatPhoneNumber(log.phone2)}
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-400">-</span>
+                          )}
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-4 sm:px-6 py-4 align-middle">
+                          {log.status ? (
+                            <span
+                              className={`inline-flex items-center px-2.5 py-1 rounded text-xs ${
+                                getTableStatusBadge(log.status).color
+                              }`}
+                            >
+                              {getTableStatusBadge(log.status).label}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400">-</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

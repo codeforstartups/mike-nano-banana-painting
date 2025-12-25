@@ -66,8 +66,8 @@ export default function Sidebar() {
     {
       href: "/paintings/table",
       icon: Table,
-      label: "Paintings Table",
-      title: "Paintings Table",
+      label: "Painting Comparison Dashboard",
+      title: "Painting Comparison Dashboard",
     },
     {
       href: "/call-logs",
@@ -103,7 +103,9 @@ export default function Sidebar() {
               <span className="text-sm font-medium">M</span>
             </div>
             <div>
-              <h1 className="text-sm font-medium text-white">Painting Generator</h1>
+              <h1 className="text-sm font-medium text-white">
+                Painting Generator
+              </h1>
             </div>
           </div>
         )}
