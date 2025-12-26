@@ -7,7 +7,6 @@ interface PaintingOptions {
   address: string;
   name: string;
   frameType: "none" | "natural-oak" | "black-oak" | "dark-oak" | "white-oak";
-  aspectRatio: "1:1" | "16:9" | "9:16";
 }
 
 interface ImageUploadProps {
@@ -171,53 +170,6 @@ export default function ImageUpload({
             placeholder="Enter address or location"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
           />
-        </div>
-
-        {/* Aspect Ratio Option */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2.5">
-            Aspect Ratio
-          </label>
-          <div className="flex flex-wrap gap-3 sm:gap-4">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="aspectRatio"
-                checked={paintingOptions.aspectRatio === "1:1"}
-                onChange={() =>
-                  onOptionsChange({ ...paintingOptions, aspectRatio: "1:1" })
-                }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 transition-colors"
-              />
-              <span className="ml-2 text-sm text-gray-700">Square (1:1)</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="aspectRatio"
-                checked={paintingOptions.aspectRatio === "16:9"}
-                onChange={() =>
-                  onOptionsChange({ ...paintingOptions, aspectRatio: "16:9" })
-                }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 transition-colors"
-              />
-              <span className="ml-2 text-sm text-gray-700">
-                Landscape (4:3)
-              </span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="aspectRatio"
-                checked={paintingOptions.aspectRatio === "9:16"}
-                onChange={() =>
-                  onOptionsChange({ ...paintingOptions, aspectRatio: "9:16" })
-                }
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 transition-colors"
-              />
-              <span className="ml-2 text-sm text-gray-700">Portrait (3:4)</span>
-            </label>
-          </div>
         </div>
 
         {/* Frame Option */}

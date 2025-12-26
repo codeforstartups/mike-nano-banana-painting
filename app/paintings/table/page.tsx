@@ -74,20 +74,30 @@ export default async function PaintingsTablePage() {
   const paintings = await getPaintings();
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
-      <div className="w-full">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200/80 px-4 sm:px-6 py-6">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-1">
-            Painting Comparison Dashboard
-          </h1>
-          <p className="text-sm text-gray-500">
-            View and manage all generated paintings
-          </p>
+        <div className="bg-white border-b border-gray-200 px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Painting Comparison Dashboard
+              </h1>
+              <p className="text-sm text-gray-600">
+                Compare original photographs with their watercolor painting transformations
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-gray-900">{paintings.length}</div>
+              <div className="text-xs text-gray-500 uppercase tracking-wide">
+                {paintings.length === 1 ? "Painting" : "Paintings"}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Table Container */}
-        <div className="px-4 sm:px-6 pb-6">
+        <div className="px-6 py-6">
           <PaintingsTable paintings={paintings} />
         </div>
       </div>

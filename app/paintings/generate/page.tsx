@@ -12,7 +12,6 @@ export default function GeneratePaintingPage() {
     address: "",
     name: "",
     frameType: "natural-oak" as "none" | "natural-oak" | "black-oak" | "dark-oak" | "white-oak",
-    aspectRatio: "1:1" as "1:1" | "16:9" | "9:16",
   });
   const [generatedPainting, setGeneratedPainting] = useState<string | null>(
     null
@@ -59,7 +58,6 @@ export default function GeneratePaintingPage() {
           address: paintingOptions.address,
           name: paintingOptions.name,
           frameType: paintingOptions.frameType,
-          aspectRatio: paintingOptions.aspectRatio,
         }),
       });
 
